@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,900&display=swap');
+
+body{
+    background: #353535;
+    font-family: Lato, sans-serif; /* the font style*/
+}
+
+.map {
+    height: 800px;
+    width: 90%;
+    float: right;
+}
+
+#layers{
+    height: 800px;
+    width: 10%;
+    float: left;
+    background: linear-gradient(#999 , #eee);
+    justify-content: center;
+    text-align: center;
+}
+
+#btn{
+    height:20px;
+    width:70px;
+}
