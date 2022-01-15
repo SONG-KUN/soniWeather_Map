@@ -1,11 +1,9 @@
-//this class is used to get data from accuweather and push it on a JSON...
 
 /*
   we store data into a big JSON at least at the beginning.
   in this way we can do a search in city/region name BEFORE do a get at accu weather, like a proxy server
-  if needed we will implement firebase exchange, but is pretty unusefull here...do a get just for...
-TODO list: 2 - implement data get and push it to an array
-           3 - transfer body of populate JSONWeatherForecast in body of get and populate array of obj
+  if needed we will implement firebase exchange, but is pretty unusefull here...do a get just for... Pontida is 214046
+TODO list: 2 - fix city management (instance of actual city? load form array of saved cities?
            4 - check if this array of obj is possible to create a map of [n][12], or if is already a json
            5 - find the way to store all city we click in a JSON to use as proxy
  */
@@ -13,12 +11,20 @@ TODO list: 2 - implement data get and push it to an array
 //following this tutorial https://www.youtube.com/watch?v=D6EzSmVh3ko
 
 const APIKey = 'b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G';
+const inchToMm = 25.4; //1 inch = 25.4 mm
+const mileToKm = 1.60934; //1 mile = 1.60934 Km
+const FToC = 5/9; //conversion for Farenheit to Celsius
+
+var lat;
+var lon;
+var forecast = []; //array of forecast of 12 hours
+var cities = [];
 
 class weatherForecast
 {
     constructor(cityC, dateTime, iconNumber, iconPhrase, temperatureV, windS, relHum, rainP, rainV, snowP, snowV, cloudC)
     {
-        this.cityCode = cityC;                       //string  city name used for search.
+        this.cityCode = cityC;                      //string  city name used for search.
         this.dateTime = dateTime;                   //string	DateTime of the forecast, displayed in ISO8601 format.
         this.iconNumber = iconNumber;               //int32	Numeric value representing an image that displays the current condition described by WeatherText. May be NULL.
         this.iconPhrase = iconPhrase;               //string	Phrase description of the forecast associated with the WeatherIcon.
@@ -45,52 +51,7 @@ class city
     }
 }
 
-const gettingWeatherDetails = async(weatherForecast) =>
-{
-    const weatherBaseUrl = "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/";
-    const query = `${id}?apikey=${APIKey}`;
-
-    const res = await fetch(weatherBaseUrl + query);
-    const data = await res.json();
-
-    //we can execute the body of populateJSONWeatherForecast body directly from here, jumping weatherForecast struct
-    //TODO: implement data get, remove redundant struct and rename JSONWeatherForecast to weatherForecast and save and array of these
-    //for etc
-
-}
-
-/**
- * This function get the city key given coordinates, eg 45.730396, 9.525920
- * @param cityInfos struct containing all city infos
- * @returns {Promise<void>} fill the struct
- */
-const getCity = async (cityInfos) =>
-{
-    const locationBaseUrl = "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search";
-    const cityCoordinates = cityInfos.latitude.toString() + ',' + cityInfos.longitude.toString();
-    const query = `?apikey=${APIKey}&q=${cityCoordinates}`;
-
-    const res = await fetch(locationBaseUrl + query);
-    const data = await res.json()
-
-    //fill our city info
-    cityInfos.cityName = data[0]['LocalizedName'];
-    cityInfos.cityCode = data[0]['Key'];
-}
-
-//conversion constants
-const inchToMm = 25.4; //1 inch = 25.4 mm
-const mileToKm = 1.60934; //1 mile = 1.60934 Km
-const FToC = 5/9; //conversion for Farenheit to Celsius
-
-
-var lat;
-var lon;
-var forecast = [12]; //array of forecast of 12 hours
-var cities = [];
-
-
-
+var currentCity = new city();
 
 /**
  * Conversion from Farenheit to Celsious (degree °F - 32) × 5/9 = 0 °C
@@ -122,14 +83,11 @@ function incToMmConverter(value)
     return value * inchToMm;
 }
 
-//filling single hour mes
-//TODO: create an array of 12 jsonWeatherForecast to use for the temporary computation, maybe is better a pair key value
 
 //1 - initialize and populate both structs X 12 times
 //is also done null value control and fix
-//maybe i can avoid support beginning struct
+//TODO verify if needed to define the object hour weather or if it assumes it exists
 
-//TODO implement this function directly in get function, get everything a lot faster.
 /**
  * This function generates an array of "struct" of weather
  * @param fullForecast is the JSON coming from the website
@@ -138,64 +96,105 @@ function incToMmConverter(value)
  */
 function populateJSONWeatherForecast(fullForecast, weatherForecast, city)
 {
-    //for 12 times, 1 per hour of forecast
-
-    weatherForecast.cityCode = city.cityCode;
-    weatherForecast.dateTime = fullForecast.dateTime;
-
-    if (fullForecast.iconNumber === null)
+    fullForecast.forEach((hourWeather) =>
     {
-        weatherForecast.iconNumber = 33;
-        weatherForecast.iconPhrase = "Clear";
-    }
-    else
-    {
-        weatherForecast.iconNumber = fullForecast.iconNumber;
-        weatherForecast.iconPhrase = fullForecast.iconPhrase;
-    }
+        weatherForecast.cityCode = city.cityCode;
+        weatherForecast.dateTime = hourWeather.DateTime;
 
+        if (hourWeather.WeatherIcon === null)
+        {
+            weatherForecast.iconNumber = 33;
+            weatherForecast.iconPhrase = "Clear";
+        }
+        else
+        {
+            weatherForecast.iconNumber = hourWeather.WeatherIcon;
+            weatherForecast.iconPhrase = hourWeather.IconPhrase;
+        }
 
-    //temperature conversion if needed
-    if (fullForecast.temperatureValue === null) weatherForecast.temperatureValue = 0;
-    else
-    {
-        if (fullForecast.temperatureUnit === "F") weatherForecast.temperatureValue = temperatureConverter(fullForecast.temperatureValue);
-        else weatherForecast.temperatureValue = fullForecast.temperatureValue;
-    }
+        //temperature conversion if needed
+        if (hourWeather.Temperature.Value === null) weatherForecast.temperatureValue = 0;
+        else
+        {
+            if (hourWeather.Temperature.Unit === "F") weatherForecast.temperatureValue = temperatureConverter(hourWeather.Temperature.Value);
+            else weatherForecast.temperatureValue = Temperature.Value;
+        }
 
-    //wind conversion if needed
-    if (fullForecast.windSpeed === null) weatherForecast.windSpeed = 0;
-    else
-    {
-        if (fullForecast.windUnit === "mi/h") weatherForecast.windSpeed = mileToKmConverter(fullForecast.windSpeed);
-        else weatherForecast.windSpeed = fullForecast.windSpeed;
-    }
+        //wind conversion if needed
+        if (fullForecast.Wind.Speed.Value === null) weatherForecast.windSpeed = 0;
+        else
+        {
+            if (hourWeather.Wind.Speed.Unit === "mi/h") weatherForecast.windSpeed = mileToKmConverter(hourWeather.Wind.Speed.Value);
+            else weatherForecast.windSpeed = fullForecast.Wind.Speed.Value;
+        }
 
-    if (fullForecast.relativeHumidity === null) weatherForecast.relativeHumidity = 0;
-    else weatherForecast.relativeHumidity = fullForecast.relativeHumidity;
+        if (hourWeather.RelativeHumidity === null) weatherForecast.relativeHumidity = 0;
+        else weatherForecast.relativeHumidity = hourWeather.RelativeHumidity;
 
-    if (fullForecast.rainProbability === null) weatherForecast.rainProbability = 0;
-    else weatherForecast.rainProbability = fullForecast.rainProbability;
+        if (hourWeather.RainProbability === null) weatherForecast.rainProbability = 0;
+        else weatherForecast.rainProbability = hourWeather.RainProbability;
 
-    //rain conversion if needed
-    if (fullForecast.rainValue === null) weatherForecast.rainValue = 0;
-    else
-    {
-        if (fullForecast.rainUnit === "in") weatherForecast.rainValue = incToMmConverter(fullForecast.rainValue);
-        else weatherForecast.rainValue = fullForecast.rainValue;
-    }
+        //rain conversion if needed
+        if (hourWeather.Rain.Value === null) weatherForecast.rainValue = 0;
+        else
+        {
+            if (hourWeather.Rain.Unit === "in") weatherForecast.rainValue = incToMmConverter(hourWeather.Rain.Value);
+            else weatherForecast.rainValue = hourWeather.Rain.Value;
+        }
 
-    if (fullForecast.snowProbability === null) weatherForecast.snowProbability = 0;
-    else weatherForecast.snowProbability = fullForecast.snowProbability;
+        if (hourWeather.SnowProbability === null) weatherForecast.snowProbability = 0;
+        else weatherForecast.snowProbability = hourWeather.SnowProbability;
 
-    //snow conversion if needed
-    if (fullForecast.snowValue === null) weatherForecast.snowValue = 0;
-    else
-    {
-        if (fullForecast.snowUnit === "in") weatherForecast.snowValue = incToMmConverter(fullForecast.snowValue);
-        else weatherForecast.snowValue = fullForecast.snowValue;
-    }
+        //snow conversion if needed
+        if (hourWeather.Snow.Value === null) weatherForecast.snowValue = 0;
+        else
+        {
+            if (hourWeather.Snow.Unit === "in") weatherForecast.snowValue = incToMmConverter(hourWeather.Snow.Value);
+            else weatherForecast.snowValue = hourWeather.Snow.Value;
+        }
 
-    if (fullForecast.cloudCover === null) weatherForecast.cloudCover = 0;
-    else weatherForecast.cloudCover = fullForecast.cloudCover;
+        if (hourWeather.CloudCover === null) weatherForecast.cloudCover = 0;
+        else weatherForecast.cloudCover = hourWeather.CloudCover;
+
+        forecast.push(hourWeather)
+    })
 }
+//TODO: fix city data management
+/**
+ * This function get the city key given coordinates, eg 45.730396, 9.525920
+ * @param cityInfos struct containing all city infos
+ * @returns {Promise<void>} fill the struct
+ */
+const getCity = async (cityInfos) =>
+{
+    const locationBaseUrl = "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search";
+    const cityCoordinates = currentCity.latitude.toString() + ',' + currentCity.longitude.toString();
+    const query = `?apikey=${APIKey}&q=${cityCoordinates}`;
+
+    const res = await fetch(locationBaseUrl + query);
+    const data = await res.json()
+
+    //fill our city info
+    currentCity.cityName = data[0]['LocalizedName'];
+    currentCity.cityCode = data[0]['Key'];
+}
+
+const gettingWeatherDetails = async(weatherForecast) =>
+{
+    const weatherBaseUrl = "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/";
+    const query = `${currentCity.cityCode}?apikey=${APIKey}`;
+    const details = "&details=true";
+
+    const res = await fetch(weatherBaseUrl + query);
+    const data = await res.json();
+
+    //we can execute the body of populateJSONWeatherForecast body directly from here, jumping weatherForecast struct
+    //TODO: implement data get, remove redundant struct and rename JSONWeatherForecast to weatherForecast and save and array of these
+    //for etc
+
+}
+
+
+
+
+
