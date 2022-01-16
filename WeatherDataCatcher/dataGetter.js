@@ -1,14 +1,8 @@
-
-/*
-  we store data into a big JSON at least at the beginning.
-  in this way we can do a search in city/region name BEFORE do a get at accu weather, like a proxy server
-  if needed we will implement firebase exchange, but is pretty unusefull here...do a get just for... Pontida is 214046
-TODO list: 2 - fix city management (instance of actual city? load form array of saved cities?
-           4 - check if this array of obj is possible to create a map of [n][12], or if is already a json
-           5 - find the way to store all city we click in a JSON to use as proxy
+/**
+ * @Author Davide Lorenzi
+ * This class is used to get weather forecast from AccuWeather using the website free (but limited) APIs
+ * Tose information will be turned to the music generator
  */
-
-//following this tutorial https://www.youtube.com/watch?v=D6EzSmVh3ko
 
 const APIKey = 'b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G';
 const inchToMm = 25.4; //1 inch = 25.4 mm
@@ -17,15 +11,16 @@ const FToC = 5/9; //conversion for Farenheit to Celsius
 
 var lat;
 var lon;
-var forecast = []; //array of forecast of 12 hours
-var cities = [];
+var currentCityForecast = []; //array of forecast of 12 hours
+var cities = []; //array of city coordinates and data
+var citiesForecast = []; //array of city coordinates and data
 
+//basic weather struct
 class weatherForecast
 {
     constructor(cityC, dateTime, iconNumber, iconPhrase, temperatureV, windS, relHum, rainP, rainV, snowP, snowV, cloudC)
     {
         this.cityCode = cityC;                      //string  city name used for search.
-        this.dateTime = dateTime;                   //string	DateTime of the forecast, displayed in ISO8601 format.
         this.iconNumber = iconNumber;               //int32	Numeric value representing an image that displays the current condition described by WeatherText. May be NULL.
         this.iconPhrase = iconPhrase;               //string	Phrase description of the forecast associated with the WeatherIcon.
         this.temperatureValue = temperatureV;       //double	Rounded value in specified units. May be NULL.
@@ -83,118 +78,137 @@ function incToMmConverter(value)
     return value * inchToMm;
 }
 
-
-//1 - initialize and populate both structs X 12 times
-//is also done null value control and fix
-//TODO verify if needed to define the object hour weather or if it assumes it exists
-
 /**
  * This function generates an array of "struct" of weather
  * @param fullForecast is the JSON coming from the website
- * @param weatherForecast is the filtered JSON we will use
- * @param city main data of the city
  */
-function populateJSONWeatherForecast(fullForecast, weatherForecast, city)
+
+function addNewForecast(fullForecast)
 {
     fullForecast.forEach((hourWeather) =>
     {
-        weatherForecast.cityCode = city.cityCode;
-        weatherForecast.dateTime = hourWeather.DateTime;
+        let tmpHourForecast = new weatherForecast();
+
+        tmpHourForecast.cityCode = currentCity.cityCode;
 
         if (hourWeather.WeatherIcon === null)
         {
-            weatherForecast.iconNumber = 33;
-            weatherForecast.iconPhrase = "Clear";
+            tmpHourForecast.iconNumber = 33;
+            tmpHourForecast.iconPhrase = "Clear";
         }
         else
         {
-            weatherForecast.iconNumber = hourWeather.WeatherIcon;
-            weatherForecast.iconPhrase = hourWeather.IconPhrase;
+            tmpHourForecast.iconNumber = hourWeather.WeatherIcon;
+            tmpHourForecast.iconPhrase = hourWeather.IconPhrase;
         }
 
         //temperature conversion if needed
-        if (hourWeather.Temperature.Value === null) weatherForecast.temperatureValue = 0;
+        if (hourWeather.Temperature.Value === null) tmpHourForecast.temperatureValue = 0;
         else
         {
-            if (hourWeather.Temperature.Unit === "F") weatherForecast.temperatureValue = temperatureConverter(hourWeather.Temperature.Value);
-            else weatherForecast.temperatureValue = Temperature.Value;
+            if (hourWeather.Temperature.Unit === "F") tmpHourForecast.temperatureValue = temperatureConverter(hourWeather.Temperature.Value);
+            else tmpHourForecast.temperatureValue = Temperature.Value;
         }
 
         //wind conversion if needed
-        if (fullForecast.Wind.Speed.Value === null) weatherForecast.windSpeed = 0;
+        if (fullForecast.Wind.Speed.Value === null) tmpHourForecast.windSpeed = 0;
         else
         {
-            if (hourWeather.Wind.Speed.Unit === "mi/h") weatherForecast.windSpeed = mileToKmConverter(hourWeather.Wind.Speed.Value);
-            else weatherForecast.windSpeed = fullForecast.Wind.Speed.Value;
+            if (hourWeather.Wind.Speed.Unit === "mi/h") tmpHourForecast.windSpeed = mileToKmConverter(hourWeather.Wind.Speed.Value);
+            else tmpHourForecast.windSpeed = fullForecast.Wind.Speed.Value;
         }
 
-        if (hourWeather.RelativeHumidity === null) weatherForecast.relativeHumidity = 0;
-        else weatherForecast.relativeHumidity = hourWeather.RelativeHumidity;
+        if (hourWeather.RelativeHumidity === null) tmpHourForecast.relativeHumidity = 0;
+        else tmpHourForecast.relativeHumidity = hourWeather.RelativeHumidity;
 
-        if (hourWeather.RainProbability === null) weatherForecast.rainProbability = 0;
-        else weatherForecast.rainProbability = hourWeather.RainProbability;
+        if (hourWeather.RainProbability === null) tmpHourForecast.rainProbability = 0;
+        else tmpHourForecast.rainProbability = hourWeather.RainProbability;
 
         //rain conversion if needed
-        if (hourWeather.Rain.Value === null) weatherForecast.rainValue = 0;
+        if (hourWeather.Rain.Value === null) tmpHourForecast.rainValue = 0;
         else
         {
-            if (hourWeather.Rain.Unit === "in") weatherForecast.rainValue = incToMmConverter(hourWeather.Rain.Value);
-            else weatherForecast.rainValue = hourWeather.Rain.Value;
+            if (hourWeather.Rain.Unit === "in") tmpHourForecast.rainValue = incToMmConverter(hourWeather.Rain.Value);
+            else tmpHourForecast.rainValue = hourWeather.Rain.Value;
         }
 
-        if (hourWeather.SnowProbability === null) weatherForecast.snowProbability = 0;
-        else weatherForecast.snowProbability = hourWeather.SnowProbability;
+        if (hourWeather.SnowProbability === null) tmpHourForecast.snowProbability = 0;
+        else tmpHourForecast.snowProbability = hourWeather.SnowProbability;
 
         //snow conversion if needed
-        if (hourWeather.Snow.Value === null) weatherForecast.snowValue = 0;
+        if (hourWeather.Snow.Value === null) tmpHourForecast.snowValue = 0;
         else
         {
-            if (hourWeather.Snow.Unit === "in") weatherForecast.snowValue = incToMmConverter(hourWeather.Snow.Value);
-            else weatherForecast.snowValue = hourWeather.Snow.Value;
+            if (hourWeather.Snow.Unit === "in") tmpHourForecast.snowValue = incToMmConverter(hourWeather.Snow.Value);
+            else tmpHourForecast.snowValue = hourWeather.Snow.Value;
         }
 
-        if (hourWeather.CloudCover === null) weatherForecast.cloudCover = 0;
-        else weatherForecast.cloudCover = hourWeather.CloudCover;
+        if (hourWeather.CloudCover === null) tmpHourForecast.cloudCover = 0;
+        else tmpHourForecast.cloudCover = hourWeather.CloudCover;
 
-        forecast.push(hourWeather)
+        currentCityForecast.push(tmpHourForecast);
     })
+    citiesForecast.push(currentCityForecast)
 }
-//TODO: fix city data management
+
+function currentCityCleaner()
+{
+    currentCity.cityCode = 0;
+    currentCity.cityName = null;
+    currentCity.longitude = 0;
+    currentCity.latitude = 0;
+}
+
 /**
- * This function get the city key given coordinates, eg 45.730396, 9.525920
- * @param cityInfos struct containing all city infos
- * @returns {Promise<void>} fill the struct
+ * This function get the city key given coordinates, eg 45.730396, 9.5259203
+ * I can't optimize avoiding queries because a mm move of click can change the city
+ * @returns {Promise<void>} populates the current city
  */
-const getCity = async (cityInfos) =>
+const getCity = async () =>
 {
     const locationBaseUrl = "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search";
     const cityCoordinates = currentCity.latitude.toString() + ',' + currentCity.longitude.toString();
     const query = `?apikey=${APIKey}&q=${cityCoordinates}`;
 
     const res = await fetch(locationBaseUrl + query);
-    const data = await res.json()
+    const tmpCity = await res.json()
 
     //fill our city info
-    currentCity.cityName = data[0]['LocalizedName'];
-    currentCity.cityCode = data[0]['Key'];
+    currentCity.cityName = tmpCity[0]['LocalizedName'];
+    currentCity.cityCode = tmpCity[0]['Key'];
 }
 
-const gettingWeatherDetails = async(weatherForecast) =>
+/**
+ * Function used for populating current city forecast
+ * @returns {Promise<void>} the get of new city forecast or the get from saved cities of needed infos.
+ */
+const gettingWeatherDetails = async() =>
 {
-    const weatherBaseUrl = "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/";
-    const query = `${currentCity.cityCode}?apikey=${APIKey}`;
-    const details = "&details=true";
+    currentCityForecast = []; //clean the array
 
-    const res = await fetch(weatherBaseUrl + query);
-    const data = await res.json();
+    //look if already downloaded
+    let found = citiesForecast.findIndex(tmpCity => tmpCity.cityCode = currentCity.cityCode);
 
-    //we can execute the body of populateJSONWeatherForecast body directly from here, jumping weatherForecast struct
-    //TODO: implement data get, remove redundant struct and rename JSONWeatherForecast to weatherForecast and save and array of these
-    //for etc
+    //if city is not present
+    if (found === -1)
+    {
+        const weatherBaseUrl = "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/";
+        const query = `${currentCity.cityCode}?apikey=${APIKey}`;
+        const details = "&details=true"; //needed for get full datas
 
+        const res = await fetch(weatherBaseUrl + query + details);
+        const fullWeather = await res.json();
+
+        addNewForecast(fullWeather);
+    }
+    else
+    {
+        /*
+         * We don't refresh data of a city if not fresh because of the limit of the query we have
+         * We also assume that we don't leave the app open for more than a day, so weather forecast are unchanged in that
+         * time
+         */
+        currentCityForecast = citiesForecast[found];
+    }
+    currentCityCleaner();
 }
-
-
-
-
-
