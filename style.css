@@ -20,7 +20,9 @@ body{
     text-align: center;
 }
 
-#btn{
-    height:20px;
-    width:70px;
+#milanoBtn{
+    height:40px;
+    width:80%;
+    font-size: 1.10em;
+    font-weight: bold;
 }

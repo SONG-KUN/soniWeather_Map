@@ -3,61 +3,85 @@
 // map
 
 // import {Fill, Stroke, Style} from 'ol/style';
+let myview;
+let map;
 
-const milano = [1026180.4891858436, 5690709.798259557];
+const MIL_LAT = 1026180.4891858436;
+const MIL_LON = 5690709.798259557;
+const milano = [MIL_LAT, MIL_LON];
+let lat;
+let lon;
 
-var myview = new ol.View({
-    // center: ol.proj.fromLonLat([37.41, 8.82]),
-    center: [1350766.668508934, 5177943.850979362], // map.getView().getCenter()
-    zoom: 6
-})
+//when html is ready, execute all below
+document.addEventListener("DOMContentLoaded", function(event) {
 
-var mylayer = new ol.layer.Tile({
-    source: new ol.source.OSM()
-})
 
-var layer = [mylayer]
-
-var styles = [
-    new ol.style.Style({
-
-        fill: new ol.style.Fill({
-            color: 'green'    //'rgba(255,255,255,0.4)'
-        }),
-
-        stroke: new ol.style.Stroke({
-            color: '#3399CC',
-            width: 1.25
-        })
+    myview = new ol.View({
+        //center: ol.proj.fromLonLat([37.41, 8.82]);
+        center: [1350766.668508934, 5177943.850979362], // map.getView().getCenter()
+        zoom: 6
     })
-];
 
-var map = new ol.Map({
-    target: 'map',
-    layers: layer,
-    view: myview
+    const mylayer = new ol.layer.Tile({
+        source: new ol.source.OSM()
+    })
+
+    const layer = [mylayer]
+
+    const styles = [
+        new ol.style.Style({
+
+            fill: new ol.style.Fill({
+                color: 'green'    //'rgba(255,255,255,0.4)'
+            }),
+
+            stroke: new ol.style.Stroke({
+                color: '#3399CC',
+                width: 1.25
+            })
+        })
+    ];
+
+    map = new ol.Map({
+        target: 'map',
+        layers: layer,
+        view: myview
+    });
+
+    const mygeojson = new ol.layer.Vector({
+        // source: new ol.source.Vector({
+        //     format : new ol.format.GeoJSON(),
+        //     url : '.json'
+        // }),
+
+        style: styles
+    })
+
+
+    map.addLayer(mygeojson);
+    map.on("click", (e) => getMapCoordOnClick(e));
+
+
+    document.getElementById("milanoBtn").addEventListener("click", zoomtomilano);
 });
 
-var mygeojson = new ol.layer.Vector({
-    // source: new ol.source.Vector({
-    //     format : new ol.format.GeoJSON(),
-    //     url : '.json'
-    // }),
-
-    style: styles
-})
-
-
-map.addLayer(mygeojson)
-
-
-function zoomtomilano(){
-    console.log("myview object", myview);
+const zoomtomilano = () => {
+    console.debug("myview object", myview);
     myview.animate({
         center: milano,
             duration: 1800,
             zoom: 11
     })
+}
+
+const getMapCoordOnClick = (evt) => {
+    const lonlat = ol.proj.toLonLat(evt.coordinate);
+    lon = lonlat[0];
+    lat = lonlat[1];
+    console.log("lon & lat", lon, lat);
+
+    //array = query accuweather
+    //sound (array)
 }
 
 // change mouse cursor when over marker

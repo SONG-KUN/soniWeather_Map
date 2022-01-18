@@ -7,7 +7,7 @@
 const APIKey = 'b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G';
 const inchToMm = 25.4; //1 inch = 25.4 mm
 const mileToKm = 1.60934; //1 mile = 1.60934 Km
-const FToC = 5/9; //conversion for Farenheit to Celsius
+const FToC = 5/9; //conversion for Fahrenheit to Celsius
 
 var lat;
 var lon;
