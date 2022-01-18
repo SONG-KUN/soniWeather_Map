@@ -4,7 +4,7 @@
 
 // import {Fill, Stroke, Style} from 'ol/style';
 
-var milano = [1026180.4891858436, 5690709.798259557];
+const milano = [1026180.4891858436, 5690709.798259557];
 
 var myview = new ol.View({
     // center: ol.proj.fromLonLat([37.41, 8.82]),
@@ -52,6 +52,7 @@ map.addLayer(mygeojson)
 
 
 function zoomtomilano(){
+    console.log("myview object", myview);
     myview.animate({
         center: milano,
             duration: 1800,
@@ -60,9 +61,9 @@ function zoomtomilano(){
 }
 
 // change mouse cursor when over marker
-map.on('pointermove', function (e) {
+/* map.on('pointermove', function (e) {
     const pixel = map.getEventPixel(e.originalEvent);
     const hit = map.hasFeatureAtPixel(pixel);
-    console.log(hit)
+    console.debug("marker hit?", hit);
     document.getElementById(map.getTarget()).style.cursor = hit ? 'pointer' : '';
-});
+}); */
