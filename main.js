@@ -75,13 +75,16 @@ const zoomtomilano = () => {
 }
 
 const getMapCoordOnClick = (evt) => {
+    //tuple of coordinates
     const lonlat = ol.proj.toLonLat(evt.coordinate);
     lon = lonlat[0];
     lat = lonlat[1];
     console.log("lon & lat", lon, lat);
 
     //array = query accuweather
-    //sound (array)
+
+    // weather params to generate sound
+    sound (lon, lat);
 }
 
 // change mouse cursor when over marker
