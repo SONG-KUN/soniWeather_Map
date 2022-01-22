@@ -11,7 +11,6 @@ const FToC = 5/9; //conversion for Farenheit to Celsius
 
 var lat;
 var lon;
-var currentCityForecast = []; //array of forecast of 12 hours
 var cities = []; //array of city coordinates and data
 var citiesForecast = []; //array of city coordinates and data
 
@@ -47,6 +46,8 @@ class city
 }
 
 var currentCity = new city();
+var currentCityForecast = []; //array of forecast of 12 hours
+
 
 /**
  * Conversion from Farenheit to Celsious (degree °F - 32) × 5/9 = 0 °C
@@ -176,6 +177,7 @@ const getCity = async () =>
     //fill our city info
     currentCity.cityName = tmpCity[0]['LocalizedName'];
     currentCity.cityCode = tmpCity[0]['Key'];
+    cities.push(currentCity);
 }
 
 /**
