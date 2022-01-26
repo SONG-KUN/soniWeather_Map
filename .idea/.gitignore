@@ -5,3 +5,5 @@
 /httpRequests/
 #ProjectFiles
 *.xml
+.idea
+
