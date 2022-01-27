@@ -1,0 +1,243 @@
+[
+  {
+    "iconNumber": "1",
+    "iconPhrase": "Sunny",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "2",
+    "iconPhrase": "Mostly Sunny",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "3",
+    "iconPhrase": "Partially Sunny",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "4",
+    "iconPhrase": "Intermittent Clouds",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "5",
+    "iconPhrase": "Hazy Sunshine",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "6",
+    "iconPhrase": "Mostly Cloudy",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "7",
+    "iconPhrase": "Cloudy",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "8",
+    "iconPhrase": "Dreary (Overcast)",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "11",
+    "iconPhrase": "Fog",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "12",
+    "iconPhrase": "Showers",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "13",
+    "iconPhrase": "MostlyCloudy w/ Showers",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "14",
+    "iconPhrase": "Partly Sunny w/ Showers",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "15",
+    "iconPhrase": "T-Storms",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "16",
+    "iconPhrase": "Mostly Cloudy w/ T-Storms",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "17",
+    "iconPhrase": "Partly Sunny w/ T-Storms",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "18",
+    "iconPhrase": "Rain",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "19",
+    "iconPhrase": "Flurries ",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "20",
+    "iconPhrase": "Mostly Cloudy w/ Flurries",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "21",
+    "iconPhrase": "Partly Sunny w/ Flurries",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "22",
+    "iconPhrase": "Snow",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "23",
+    "iconPhrase": "Mostly Cloudy w/ Snow",
+    "day": "yes",
+    "night": "no"
+  },
+  {
+    "iconNumber": "24",
+    "iconPhrase": "Ice",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "25",
+    "iconPhrase": "Sleet",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "26",
+    "iconPhrase": "Freezing Rain",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+  "iconNumber": "29",
+  "iconPhrase": "Rain and Snow",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "30",
+    "iconPhrase": "Hot",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "31",
+    "iconPhrase": "Cold",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "32",
+    "iconPhrase": "Windy",
+    "day": "yes",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "33",
+    "iconPhrase": "Clear",
+    "day": "no",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "34",
+    "iconPhrase": "Mostly Clear",
+    "day": "no",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "35",
+    "iconPhrase": "Partly Cloudy",
+    "day": "no",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "36",
+    "iconPhrase": "Intermittent Clouds",
+    "day": "no",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "37",
+    "iconPhrase": "Hazy Moonlight",
+    "day": "no",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "38",
+    "iconPhrase": "Mostly Cloudy",
+    "day": "no",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "39",
+    "iconPhrase": "Partly Cloudy w/ Showers",
+    "day": "no",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "40",
+    "iconPhrase": "Mostly Cloudy w/ Showers",
+    "day": "no",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "41",
+    "iconPhrase": "Partly Cloudy w/ T-Storms",
+    "day": "no",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "42",
+    "iconPhrase": "Partly Cloudy w/ T-Storms",
+    "day": "no",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "43",
+    "iconPhrase": "Mostly Cloudy w/ Flurries",
+    "day": "no",
+    "night": "yes"
+  },
+  {
+    "iconNumber": "44",
+    "iconPhrase": "Mostly Cloudy w/ Snow",
+    "day": "no",
+    "night": "yes"
+  }
+
+]
