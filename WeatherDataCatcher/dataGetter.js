@@ -161,11 +161,90 @@ function currentCityCleaner()
 }
 
 /**
+ * Used to retrieve the forecast of a specific hour of a specific city
+ * @requires city forecast already retrieved from internet
+ * @param cityCode is the city code used for search the city
+ * @param hour is the hour [0-11] of forecast we will read
+ * @param normalize boolean, if true are returned normalized data
+ * @returns {weatherForecast} all features of an hour weather forecast
+ */
+function getCityHourForecast(cityCode, hour, normalize)
+{
+    let hourlyWeatherForecast = new weatherForecast();
+
+    hourlyWeatherForecast.cityCode = cities[cityCode].cityCode;                      //string  city name used for search.
+    hourlyWeatherForecast.iconNumber = cities[cityCode].iconNumber;               //int32	Numeric value representing an image that displays the current condition described by WeatherText. May be NULL.
+    hourlyWeatherForecast.iconPhrase = cities[cityCode].iconPhrase;               //string	Phrase description of the forecast associated with the WeatherIcon.
+    hourlyWeatherForecast.temperatureValue = cities[cityCode].temperatureValue;       //double	Rounded value in specified units. May be NULL.
+    hourlyWeatherForecast.windSpeed = cities[cityCode].windSpeed;                     //double	Rounded value in specified units. May be NULL.
+    hourlyWeatherForecast.relativeHumidity = cities[cityCode].relativeHumidity;             //int32	Relative humidity. May be NULL.
+    hourlyWeatherForecast.rainProbability = cities[cityCode].rainProbability;               //int32	Percent representing the probability of rain. May be NULL.
+    hourlyWeatherForecast.rainValue = cities[cityCode].rainValue;                     //double	Rounded value in specified units. May be NULL.
+    hourlyWeatherForecast.snowProbability = cities[cityCode].snowProbability;               //int32	Percent representing the probability of snow. May be NULL.
+    hourlyWeatherForecast.snowValue = cities[cityCode].snowValue;                     //double	Rounded value in specified units. May be NULL.
+    hourlyWeatherForecast.cloudCover = cities[cityCode].cloudCover;
+
+    if (normalize)
+    {
+        return dataNormalizer(hourlyWeatherForecast)
+    }
+    else
+    {
+        return hourlyWeatherForecast;
+    }
+}
+
+/**
+ * Function used to normalize an hourly forecast
+ * @param hourlyForecast forecast of one hour
+ * @returns {weatherForecast}  normalized hour forecast
+ */
+function dataNormalizer(hourlyForecast)
+{
+    let normalizedData = new weatherForecast();
+
+    normalizedData.cityCode = hourlyForecast.cityCode;                      //string  city name used for search.
+    normalizedData.iconNumber = hourlyForecast.iconNumber;               //int32	Numeric value representing an image that displays the current condition described by WeatherText. May be NULL.
+    normalizedData.iconPhrase = hourlyForecast.iconPhrase;               //string	Phrase description of the forecast associated with the WeatherIcon.
+    normalizedData.temperatureValue = hourlyForecast.temperatureValue;       //double	Rounded value in specified units. May be NULL.
+    normalizedData.windSpeed = hourlyForecast.windSpeed;                     //double	Rounded value in specified units. May be NULL.
+    normalizedData.relativeHumidity = hourlyForecast.relativeHumidity;             //int32	Relative humidity. May be NULL.
+    normalizedData.rainProbability = hourlyForecast.rainProbability;               //int32	Percent representing the probability of rain. May be NULL.
+    normalizedData.rainValue = hourlyForecast.rainValue;                     //double	Rounded value in specified units. May be NULL.
+    normalizedData.snowProbability = hourlyForecast.snowProbability;               //int32	Percent representing the probability of snow. May be NULL.
+    normalizedData.snowValue = hourlyForecast.snowValue;                     //double	Rounded value in specified units. May be NULL.
+    normalizedData.cloudCover = hourlyForecast.cloudCover;
+
+    return normalizedData;
+}
+
+/**
+ * This function get the city key given the name, Milan
+ * I can't optimize avoiding queries because a mm move of click can change the city
+ * @returns {Promise<void>} populates the current city
+ */
+const getCityByName = async () =>
+{
+    const locationBaseUrl = "http://dataservice.accuweather.com/locations/v1/cities/search";
+    const cityName = currentCity.cityName;
+    const query = `?apikey=${APIKey}&q=${cityName}`;
+
+    const res = await fetch(locationBaseUrl + query);
+    const tmpCity = await res.json()
+
+    //fill our city info
+    currentCity.cityCode = tmpCity[0]['Key'];
+    //unused in further development ATM
+    currentCity.latitude = tmpCity[0].GeoPosition['Latitude'];
+    currentCity.longitude = tmpCity[0].GeoPosition['Longitude'];
+    cities.push(currentCity);
+}
+/**
  * This function get the city key given coordinates, eg 45.730396, 9.5259203
  * I can't optimize avoiding queries because a mm move of click can change the city
  * @returns {Promise<void>} populates the current city
  */
-const getCity = async () =>
+const getCityByCoordinates = async () =>
 {
     const locationBaseUrl = "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search";
     const cityCoordinates = currentCity.latitude.toString() + ',' + currentCity.longitude.toString();
@@ -215,28 +294,3 @@ const gettingWeatherDetails = async() =>
     currentCityCleaner();
 }
 
-/**
- * Used to retrieve the forecast of a specific hour of a specific city
- * @requires city forecast already retrieved from internet
- * @param cityCode is the city code used for search the city
- * @param hour is the hour [0-11] of forecast we will read
- * @returns {weatherForecast} all features of an hour weather forecast
- */
-function getCityHourForecast(cityCode, hour)
-{
-    let hourlyWeatherForecast = new weatherForecast();
-
-    hourlyWeatherForecast.cityCode = cities[cityCode].cityCode;                      //string  city name used for search.
-    hourlyWeatherForecast.iconNumber = cities[cityCode].iconNumber;               //int32	Numeric value representing an image that displays the current condition described by WeatherText. May be NULL.
-    hourlyWeatherForecast.iconPhrase = cities[cityCode].iconPhrase;               //string	Phrase description of the forecast associated with the WeatherIcon.
-    hourlyWeatherForecast.temperatureValue = cities[cityCode].temperatureValue;       //double	Rounded value in specified units. May be NULL.
-    hourlyWeatherForecast.windSpeed = cities[cityCode].windSpeed;                     //double	Rounded value in specified units. May be NULL.
-    hourlyWeatherForecast.relativeHumidity = cities[cityCode].relativeHumidity;             //int32	Relative humidity. May be NULL.
-    hourlyWeatherForecast.rainProbability = cities[cityCode].rainProbability;               //int32	Percent representing the probability of rain. May be NULL.
-    hourlyWeatherForecast.rainValue = cities[cityCode].rainValue;                     //double	Rounded value in specified units. May be NULL.
-    hourlyWeatherForecast.snowProbability = cities[cityCode].snowProbability;               //int32	Percent representing the probability of snow. May be NULL.
-    hourlyWeatherForecast.snowValue = cities[cityCode].snowValue;                     //double	Rounded value in specified units. May be NULL.
-    hourlyWeatherForecast.cloudCover = cities[cityCode].cloudCover;
-
-    return hourlyWeatherForecast;
-}
