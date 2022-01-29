@@ -214,3 +214,29 @@ const gettingWeatherDetails = async() =>
     }
     currentCityCleaner();
 }
+
+/**
+ * Used to retrieve the forecast of a specific hour of a specific city
+ * @requires city forecast already retrieved from internet
+ * @param cityCode is the city code used for search the city
+ * @param hour is the hour [0-11] of forecast we will read
+ * @returns {weatherForecast} all features of an hour weather forecast
+ */
+function getCityHourForecast(cityCode, hour)
+{
+    let hourlyWeatherForecast = new weatherForecast();
+
+    hourlyWeatherForecast.cityCode = cities[cityCode].cityCode;                      //string  city name used for search.
+    hourlyWeatherForecast.iconNumber = cities[cityCode].iconNumber;               //int32	Numeric value representing an image that displays the current condition described by WeatherText. May be NULL.
+    hourlyWeatherForecast.iconPhrase = cities[cityCode].iconPhrase;               //string	Phrase description of the forecast associated with the WeatherIcon.
+    hourlyWeatherForecast.temperatureValue = cities[cityCode].temperatureValue;       //double	Rounded value in specified units. May be NULL.
+    hourlyWeatherForecast.windSpeed = cities[cityCode].windSpeed;                     //double	Rounded value in specified units. May be NULL.
+    hourlyWeatherForecast.relativeHumidity = cities[cityCode].relativeHumidity;             //int32	Relative humidity. May be NULL.
+    hourlyWeatherForecast.rainProbability = cities[cityCode].rainProbability;               //int32	Percent representing the probability of rain. May be NULL.
+    hourlyWeatherForecast.rainValue = cities[cityCode].rainValue;                     //double	Rounded value in specified units. May be NULL.
+    hourlyWeatherForecast.snowProbability = cities[cityCode].snowProbability;               //int32	Percent representing the probability of snow. May be NULL.
+    hourlyWeatherForecast.snowValue = cities[cityCode].snowValue;                     //double	Rounded value in specified units. May be NULL.
+    hourlyWeatherForecast.cloudCover = cities[cityCode].cloudCover;
+
+    return hourlyWeatherForecast;
+}
