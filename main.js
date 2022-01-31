@@ -206,7 +206,7 @@ const getMapCoordOnClick = (evt) => {
     //array = query accuweather
 
     // weather params to generate sound
-    sound (lon, lat);
+    sound (lonlat);
 }
 
 
