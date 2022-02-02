@@ -14,6 +14,7 @@ function sound(weatherParameters) {
      */
 
     let wind = 100;
+    let rain = 100;
 
     //MAPPING:
     //lon to freq
@@ -35,7 +36,57 @@ function sound(weatherParameters) {
     //}
 
     const intervalWind = setInterval(playWind, 10000, wind)
+    const intervalRain = setInterval(playRain, 500, rain)
 
+    function playRain (rain) {
+        const now = c.currentTime;
+        const o1 = c.createOscillator()
+        const o2 = c.createOscillator()
+        const o3 = c.createOscillator()
+        const g = c.createGain();
+
+        //const dur = randomNumber(0.1,0.1);
+        const dur = randomNumber(50, 200) / 1000;
+        console.log(dur);
+        const att = 0.01;
+        const dec = 0.02;
+
+        o1.frequency.value = randomNumber(300, 500)
+        o2.frequency.value = randomNumber(300, 500)
+        o3.frequency.value = randomNumber(300, 500)
+        //o.detune;
+        o1.type = "sine"
+        o2.type = "sine"
+        o3.type = "sine"
+
+        o1.connect(g);
+        o2.connect(g);
+        o3.connect(g);
+
+        g.connect(c.destination)
+
+        //no attack
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.1, now+att);
+        g.gain.linearRampToValueAtTime(0.1, now + dur - dec);
+        g.gain.linearRampToValueAtTime(0, now + dur);
+
+        o1.start(now);
+        o1.stop(now+dur);
+        o2.start(now);
+        o2.stop(now+dur);
+        o3.start(now);
+        o3.stop(now+dur);
+        //console.log("note ended", now);
+
+        if (c.currentTime - startTime > totalDuration)
+        {
+            console.log("time: ", c.currentTime - startTime)
+            clearInterval(intervalRain)
+        }
+
+
+    }
     function playWind (wind) {
         console.log("IN", c.currentTime)
         //play with a certain probability according the wind quantity
@@ -47,8 +98,9 @@ function sound(weatherParameters) {
 
 
             //wind event has a random duration
-            const eventDur = randomNumber(1, 10);
+            const eventDur = randomNumber(10, 100)/10;
             const att = eventDur / 10;
+            const dec = eventDur / 10;
             console.log("OK", eventDur)
 
             const now = c.currentTime;
@@ -65,7 +117,7 @@ function sound(weatherParameters) {
             const bpfStartFreq = randomNumber(200, 2000);
             const bpfStopFreq = randomNumber(200, 2000);
             bpf.frequency.setValueAtTime(bpfStartFreq, now );
-            bpf.frequency.setValueAtTime(bpfStopFreq, now+eventDur );
+            bpf.frequency.linearRampToValueAtTime(bpfStopFreq, now+eventDur );
 
             const bufferSize = 2 * c.sampleRate,
                 noiseBuffer = c.createBuffer(1, bufferSize, c.sampleRate),
@@ -79,6 +131,7 @@ function sound(weatherParameters) {
 
             ampGain.gain.setValueAtTime(0, now);
             ampGain.gain.linearRampToValueAtTime(1, now+att);
+            ampGain.gain.linearRampToValueAtTime(1, now+eventDur - dec);
             ampGain.gain.linearRampToValueAtTime(0, now+eventDur);
 
             lfo.connect(ampGain.gain);
