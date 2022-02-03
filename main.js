@@ -199,14 +199,18 @@ function zoomtomilano(){
 const getMapCoordOnClick = (evt) => {
     //tuple of coordinates
     const lonlat = ol.proj.toLonLat(evt.coordinate);
-        lon = lonlat[0];
-        lat = lonlat[1];
-    console.log("lon & lat", lon, lat);
+    //prepare clean ambient
+    currentCityCleaner();
+    currentCityForecast = []
+    currentCity.longitude = lonlat[0];
+    currentCity.latitude = lonlat[1];
+    console.log("lon & lat", currentCity.longitude, currentCity.latitude);
 
-    //array = query accuweather
+    //doing the query to get forecast (or load it in current city)
+    getCityByCoordinates().then(r => gettingWeatherDetails());
 
-    // weather params to generate sound
-    sound (lonlat);
+    // weather params to generate sound; 0 is the current hour, stubbed, returns forecast of 1 hour
+    sound (currentCityForecast[0]);
 }
 
 

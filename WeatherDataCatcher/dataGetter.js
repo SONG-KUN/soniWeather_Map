@@ -285,32 +285,14 @@ function populateValuesConstraints()
  * @requires city forecast already retrieved from internet
  * @param cityCode is the city code used for search the city
  * @param hour is the hour [0-11] of forecast we will read
- * @param normalize boolean, if true are returned normalized data
  * @returns {weatherForecast} all features of an hour weather forecast
  */
-function getCityHourForecast(cityCode, hour, normalize)
+function getCityHourForecast(cityCode, hour)
 {
-    let hourlyWeatherForecast = new weatherForecast();
-
-    hourlyWeatherForecast.cityCode = cities[cityCode].cityCode;                      //string  city name used for search.
-    hourlyWeatherForecast.iconNumber = cities[cityCode].iconNumber;               //int32	Numeric value representing an image that displays the current condition described by WeatherText. May be NULL.
-    hourlyWeatherForecast.iconPhrase = cities[cityCode].iconPhrase;               //string	Phrase description of the forecast associated with the WeatherIcon.
-    hourlyWeatherForecast.temperatureValue = cities[cityCode].temperatureValue;       //double	Rounded value in specified units. May be NULL.
-    hourlyWeatherForecast.windSpeed = cities[cityCode].windSpeed;                     //double	Rounded value in specified units. May be NULL.
-    hourlyWeatherForecast.relativeHumidity = cities[cityCode].relativeHumidity;             //int32	Relative humidity. May be NULL.
-    hourlyWeatherForecast.rainProbability = cities[cityCode].rainProbability;               //int32	Percent representing the probability of rain. May be NULL.
-    hourlyWeatherForecast.rainValue = cities[cityCode].rainValue;                     //double	Rounded value in specified units. May be NULL.
-    hourlyWeatherForecast.snowProbability = cities[cityCode].snowProbability;               //int32	Percent representing the probability of snow. May be NULL.
-    hourlyWeatherForecast.snowValue = cities[cityCode].snowValue;                     //double	Rounded value in specified units. May be NULL.
-    hourlyWeatherForecast.cloudCover = cities[cityCode].cloudCover;
-
-    if (normalize)
+    for(let i = 0; i < citiesForecast.length; i++)
     {
-        return dataNormalizer(hourlyWeatherForecast)
-    }
-    else
-    {
-        return hourlyWeatherForecast;
+        if (citiesForecast[i][hour].cityCode === cityCode)
+            return citiesForecast[i][hour].cityCode;
     }
 }
 
@@ -365,6 +347,7 @@ const gettingWeatherDetails = async() =>
     currentCityForecast = []; //clean the array
 
     //look if already downloaded
+    //if not working use getCityHourForecast
     let found = citiesForecast.findIndex(tmpCity => tmpCity.cityCode = currentCity.cityCode);
 
     //if city is not present
@@ -385,9 +368,9 @@ const gettingWeatherDetails = async() =>
          * We don't refresh data of a city if not fresh because of the limit of the query we have
          * We also assume that we don't leave the app open for more than a day, so weather forecast are unchanged in that
          * time
+         * Returns 12 hours forecast
          */
         currentCityForecast = citiesForecast[found];
     }
-    currentCityCleaner();
 }
 

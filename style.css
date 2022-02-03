@@ -61,7 +61,7 @@ body{
 
 /*.overlay-cotainer #feature-additional-info::after{*/
     /*content: '';*/
-#feature-name{
+#feature-name {
 
     /*position: absolute;*/
     /*top: 100%;*/
@@ -70,3 +70,4 @@ body{
     /*border-width: 2px;*/
     /*border-style: ridge;*/
     /*border-color: #555 transparent transparent transparent;*/
+}
