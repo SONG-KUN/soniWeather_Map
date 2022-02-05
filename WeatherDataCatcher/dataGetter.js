@@ -3,6 +3,7 @@
  * This class is used to get weather forecast from AccuWeather using the website free (but limited) APIs
  * Tose information will be turned to the music generator
  */
+var debug = 0; //debug variable used to
 
 const APIKey = 'b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G';
 const inchToMm = 25.4; //1 inch = 25.4 mm
@@ -18,11 +19,39 @@ const minTemperature = -10;
 const maxRain = 15;
 const maxSnow = 5000; //mm of snow
 
-var lat;
-var lon;
+var citiesNumber = 0;
+var forecastNumber = 0;
+
 var cities = []; //array of city coordinates and data
 var citiesForecast = []; //array of city coordinates and data
-var valueConstraints = [];
+var valueConstraints =
+    [
+        {
+            "valueName" : "Percentage",
+            "maxValue"  : maxPercentage,
+            "minValue"  : flatValue
+        },
+        {
+            "valueName" : "Temperature",
+            "maxValue"  : maxTemperature,
+            "minValue"  : minTemperature
+        },
+        {
+            "valueName" : "Wind",
+            "maxValue"  : maxWind,
+            "minValue"  : flatValue
+        },
+        {
+            "valueName" : "Rain",
+            "maxValue"  : maxRain,
+            "minValue"  : flatValue
+        },
+        {
+            "valueName" : "Snow",
+            "maxValue"  : maxSnow,
+            "minValue"  : flatValue
+        }
+    ];
 
 
 //basic weather struct
@@ -37,8 +66,8 @@ class weatherForecast
         this.windSpeed = windS;                     //double	Rounded value in specified units. May be NULL.
         this.relativeHumidity = relHum;             //int32  	Relative humidity. May be NULL.
         this.rainProbability = rainP;               //int32	    Percent representing the probability of rain. May be NULL.
-        this.rainValue = rainV;                     //double	Rounded value in specified units. May be NULL.
         this.snowProbability = snowP;               //int32  	Percent representing the probability of snow. May be NULL.
+        this.rainValue = rainV;                     //double	Rounded value in specified units. May be NULL.
         this.snowValue = snowV;                     //double	Rounded value in specified units. May be NULL.
         this.cloudCover = cloudC;                   //int32 	Number representing the percentage of the sky that is covered by clouds. May be NULL.
     }
@@ -56,19 +85,8 @@ class city
     }
 }
 
-class forecastData
-{
-    constructor(max, min, name)
-    {
-        this.valueName = name;
-        this.maxValue = max;
-        this.minValue = min;
-    }
-}
-
 var currentCity = new city();
 var currentCityForecast = []; //array of forecast of 12 hours
-
 
 /**
  * Conversion from Farenheit to Celsius (degree °F - 32) × 5/9 = 0 °C
@@ -116,21 +134,32 @@ function getDataConstraints()
  * @param fullForecast is the JSON coming from the website
  */
 
+/**
+ * Resets current city value
+ */
+function currentCityCleaner()
+{
+    currentCity.cityCode = 0;
+    currentCity.cityName = null;
+    currentCity.longitude = 0;
+    currentCity.latitude = 0;
+}
+
+/**
+ * This function parses the JSON response coming from API into a 12hour data structure
+ * @param fullForecast
+ */
 function addNewForecast(fullForecast)
 {
-    fullForecast.forEach((hourWeather) =>
-    {
+    fullForecast.forEach((hourWeather) => {
         let tmpHourForecast = new weatherForecast();
 
         tmpHourForecast.cityCode = currentCity.cityCode;
 
-        if (hourWeather.WeatherIcon === null)
-        {
+        if (hourWeather.WeatherIcon === null) {
             tmpHourForecast.iconNumber = 33;
             tmpHourForecast.iconPhrase = "Clear";
-        }
-        else
-        {
+        } else {
             tmpHourForecast.iconNumber = hourWeather.WeatherIcon;
             tmpHourForecast.iconPhrase = hourWeather.IconPhrase;
         }
@@ -138,32 +167,16 @@ function addNewForecast(fullForecast)
         //temperature conversion if needed
         if (hourWeather.Temperature.Value === null)
             tmpHourForecast.temperatureValue = 0;
-        else
-        {
+        else {
             if (hourWeather.Temperature.Unit === "F")
                 tmpHourForecast.temperatureValue = temperatureConverter(hourWeather.Temperature.Value);
             else tmpHourForecast.temperatureValue = Temperature.Value;
             //temperature
-            if (tmpHourForecast.temperatureValue >= maxTemperature)
-            {
+            if (tmpHourForecast.temperatureValue >= maxTemperature) {
                 tmpHourForecast.temperatureValue = maxTemperature
             }   //double	Rounded value in specified units. May be NULL.;
             else if (tmpHourForecast.temperatureValue < minTemperature)
                 tmpHourForecast.temperatureValue = minTemperature;
-        }
-
-        //wind
-        if (fullForecast.Wind.Speed.Value === null)
-            tmpHourForecast.windSpeed = 0;
-        else
-        {
-            if (hourWeather.Wind.Speed.Unit === "mi/h")
-                tmpHourForecast.windSpeed = mileToKmConverter(hourWeather.Wind.Speed.Value);
-            else
-                tmpHourForecast.windSpeed = fullForecast.Wind.Speed.Value;
-
-            if (tmpHourForecast.windSpeed > maxWind)
-                tmpHourForecast.windSpeed = maxWind;
         }
 
         //humidity
@@ -212,73 +225,37 @@ function addNewForecast(fullForecast)
         else
             tmpHourForecast.cloudCover = hourWeather.CloudCover;
 
+        //wind
+        if (hourWeather.Wind.Speed.Value === null)
+            tmpHourForecast.windSpeed = 0;
+        else
+        {
+            if (hourWeather.Wind.Speed.Unit === "mi/h")
+                tmpHourForecast.windSpeed = mileToKmConverter(hourWeather.Wind.Speed.Value);
+            else
+                tmpHourForecast.windSpeed = fullForecast.Wind.Speed.Value;
+
+            if (tmpHourForecast.windSpeed > maxWind)
+                tmpHourForecast.windSpeed = maxWind;
+        }
+        if (debug === 1)
+        {
+            console.log("HourForecast")
+            console.log(tmpHourForecast);
+        }
         currentCityForecast.push(tmpHourForecast);
     })
-    citiesForecast.push(currentCityForecast)
+    citiesForecast[forecastNumber] = currentCityForecast;
+    forecastNumber++;
+
+    if (debug === 1)
+    {
+        console.log("CurrentCityForecast")
+        console.log(currentCityForecast);
+        console.log("Forecast Number", forecastNumber);
+    }
 }
 
-/**
- * Resets current city value
- */
-function currentCityCleaner()
-{
-    currentCity.cityCode = 0;
-    currentCity.cityName = null;
-    currentCity.longitude = 0;
-    currentCity.latitude = 0;
-}
-
-function tmpForecastCleaner(tmpStructure)
-{
-    tmpStructure.name = null;
-    tmpStructure.maxValue = 0;
-    tmpStructure.minValue = 0;
-}
-
-function populateValuesConstraints()
-{
-    let tmpForecastData = new forecastData();
-
-    //percentage (probabilities and relative humidity values) cloud cover
-    tmpForecastData.valueName = "Percentage";
-    tmpForecastData.maxValue = maxPercentage;
-    tmpForecastData.minValue = flatValue;
-
-    valueConstraints.push(tmpForecastData);
-    tmpForecastCleaner(tmpForecastData);
-
-    //temperature
-    tmpForecastData.valueName = "Temperature";
-    tmpForecastData.maxValue = maxTemperature;
-    tmpForecastData.minValue = minTemperature;
-
-    valueConstraints.push(tmpForecastData);
-    tmpForecastCleaner(tmpForecastData);
-
-    //windSpeed
-    tmpForecastData.valueName = "Wind";
-    tmpForecastData.maxValue = maxWind;
-    tmpForecastData.minValue = flatValue;
-
-    valueConstraints.push(tmpForecastData);
-    tmpForecastCleaner(tmpForecastData);
-
-    //rain
-    tmpForecastData.valueName = "Rain";
-    tmpForecastData.maxValue = maxRain;
-    tmpForecastData.minValue = flatValue;
-
-    valueConstraints.push(tmpForecastData);
-    tmpForecastCleaner(tmpForecastData);
-
-    //snow
-    tmpForecastData.valueName = "Snow";
-    tmpForecastData.maxValue = maxSnow;
-    tmpForecastData.minValue = flatValue;
-
-    valueConstraints.push(tmpForecastData);
-    tmpForecastCleaner(tmpForecastData);
-}
 
 /**
  * Used to retrieve the forecast of a specific hour of a specific city
@@ -301,7 +278,7 @@ function getCityHourForecast(cityCode, hour)
  * I can't optimize avoiding queries because a mm move of click can change the city
  * @returns {Promise<void>} populates the current city
  */
-const getCityByName = async () =>
+async function getCityByName()
 {
     const locationBaseUrl = "http://dataservice.accuweather.com/locations/v1/cities/search";
     const cityName = currentCity.cityName;
@@ -310,12 +287,14 @@ const getCityByName = async () =>
     const res = await fetch(locationBaseUrl + query);
     const tmpCity = await res.json()
 
+    const {GeoPosition, Key} = tmpCity;
     //fill our city info
-    currentCity.cityCode = tmpCity[0]['Key'];
+    currentCity.cityCode = Key;
     //unused in further development ATM
-    currentCity.latitude = tmpCity[0].GeoPosition['Latitude'];
-    currentCity.longitude = tmpCity[0].GeoPosition['Longitude'];
-    cities.push(currentCity);
+    currentCity.latitude = GeoPosition.Latitude;
+    currentCity.longitude = GeoPosition.Longitude;
+    cities[citiesNumber] = currentCity;
+    citiesNumber++;
 }
 
 /**
@@ -323,26 +302,38 @@ const getCityByName = async () =>
  * I can't optimize avoiding queries because a mm move of click can change the city
  * @returns {Promise<void>} populates the current city
  */
-const getCityByCoordinates = async () =>
+async function getCityByCoordinates ()
 {
+    if (debug === 1)
+    {
+        console.log(currentCity.latitude);
+        console.log(currentCity.longitude);
+    }
     const locationBaseUrl = "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search";
     const cityCoordinates = currentCity.latitude.toString() + ',' + currentCity.longitude.toString();
     const query = `?apikey=${APIKey}&q=${cityCoordinates}`;
 
     const res = await fetch(locationBaseUrl + query);
     const tmpCity = await res.json()
+    if (debug === 1) console.log(tmpCity);
+    const {LocalizedName, Key} = tmpCity;
 
     //fill our city info
-    currentCity.cityName = tmpCity[0]['LocalizedName'];
-    currentCity.cityCode = tmpCity[0]['Key'];
-    cities.push(currentCity);
+    currentCity.cityName = LocalizedName;
+    currentCity.cityCode = Key;
+    cities[citiesNumber] = currentCity;
+    citiesNumber++;
+    if (debug === 1)
+    {
+        console.log(currentCity, citiesNumber);
+    }
 }
 
 /**
  * Function used for populating current city forecast
  * @returns {Promise<void>} the get of new city forecast or the get from saved cities of needed infos.
  */
-const gettingWeatherDetails = async() =>
+async function gettingWeatherDetails()
 {
     currentCityForecast = []; //clean the array
 
@@ -359,7 +350,7 @@ const gettingWeatherDetails = async() =>
 
         const res = await fetch(weatherBaseUrl + query + details);
         const fullWeather = await res.json();
-
+        if(debug === 1) console.log(fullWeather);
         addNewForecast(fullWeather);
     }
     else
@@ -373,4 +364,3 @@ const gettingWeatherDetails = async() =>
         currentCityForecast = citiesForecast[found];
     }
 }
-

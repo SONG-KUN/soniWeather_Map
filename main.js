@@ -7,9 +7,6 @@ let lon;
 // location of MILANO
 var milano = [1026180.4891858436, 5690709.798259557];
 
-
-
-
 //
 document.addEventListener("DOMContentLoaded", function(event){
 // view
@@ -182,9 +179,6 @@ document.addEventListener("DOMContentLoaded", function(event){
 
     }
 
-
-
-
 });
 
 
@@ -204,10 +198,10 @@ const getMapCoordOnClick = (evt) => {
     currentCityForecast = []
     currentCity.longitude = lonlat[0];
     currentCity.latitude = lonlat[1];
-    console.log("lon & lat", currentCity.longitude, currentCity.latitude);
 
     //doing the query to get forecast (or load it in current city)
     getCityByCoordinates().then(r => gettingWeatherDetails());
+    console.log(citiesForecast);
 
     // weather params to generate sound; 0 is the current hour, stubbed, returns forecast of 1 hour
     sound (currentCityForecast[0]);
