@@ -1,4 +1,6 @@
 // location of MILANO
+import {ol} from "./libs/v6.9.0-dist/ol";
+
 var milano = [1026180.4891858436, 5690709.798259557];
 
 // view

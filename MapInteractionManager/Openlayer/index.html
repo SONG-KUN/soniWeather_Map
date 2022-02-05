@@ -27,9 +27,15 @@
         <div class = "grid-1">
             <div class = "sidebar">
                 <h2>Base Layers</h2>
-                <input type = "radio" name = "baseLayerRadioButton" value = "OSMStandard" checked>OSM standard<br>
-                <input type = "radio" name = "baseLayerRadioButton" value = "OSMHumanitarian">OSM Humanitarian<br>
-                <input type = "radio" name = "baseLayerRadioButton" value = "StamenTerrain">Stamen Terrain<br>
+                <label>
+                    <input type = "radio" name = "baseLayerRadioButton" value = "OSMStandard" checked>
+                </label>OSM standard<br>
+                <label>
+                    <input type = "radio" name = "baseLayerRadioButton" value = "OSMHumanitarian">
+                </label>OSM Humanitarian<br>
+                <label>
+                    <input type = "radio" name = "baseLayerRadioButton" value = "StamenTerrain">
+                </label>Stamen Terrain<br>
 
                 <h3>Location:</h3>
                 <button>
@@ -42,7 +48,7 @@
             <div id = "map" class = "map"></div>
         </div>
 
-        <div class = "overlay-cotainer">
+        <div class = "overlay-container">
             <span id = "feature-name" class = "overlay-text"></span><br>
             <span id = "feature-additional-info" class = "overlay-text"></span><br>
         </div>
@@ -50,6 +56,8 @@
     </div>
 
     <script src = "main.js"></script>
+    <script src = "../WeatherDataCatcher/dataGetter.js"></script>
+    <script src = "../SoundDesigner/soundGenerator.js"></script>  <!-- <script src = "SoundDesigner/soundGenerator.js"></script> -->
     <script src = "./libs/v6.9.0-dist/ol.js"></script>
 
 </body>
