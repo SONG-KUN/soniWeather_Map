@@ -3,9 +3,8 @@
  * This class is used to get weather forecast from AccuWeather using the website free (but limited) APIs
  * Tose information will be turned to the music generator
  */
-var debug = 0; //debug variable used to
+var debug = 1; //debug variable used to
 
-const APIKey = 'b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G';
 const inchToMm = 25.4; //1 inch = 25.4 mm
 const mileToKm = 1.60934; //1 mile = 1.60934 Km
 const FToC = 5/9; //conversion for Farenheit to Celsius
@@ -22,7 +21,7 @@ const maxSnow = 5000; //mm of snow
 var CitiesNumber = 0;
 
 var cities = []; //array of city coordinates and data
-var citiesForecast = [[]]; //array of city coordinates and data
+var citiesForecast = []; //array of city coordinates and data
 var valueConstraints =
     [
         {
@@ -86,6 +85,16 @@ class city
 
 var currentCity = new city();
 var currentCityForecast = []; //array of forecast of 12 hours
+
+/**
+ * Gets an API key for gets from AccuWeather
+ * @returns {string} a random API between ones available
+ */
+function getAPIKey()
+{
+    let index = Math.floor(Math.random() * APIKeys.length);
+    return APIKeys[index];
+}
 
 /**
  * Conversion from Farenheit to Celsius (degree °F - 32) × 5/9 = 0 °C
@@ -267,7 +276,8 @@ async function getCityByName()
 {
     const locationBaseUrl = "http://dataservice.accuweather.com/locations/v1/cities/search";
     const cityName = currentCity.cityName;
-    const query = `?apikey=${APIKey}&q=${cityName}`;
+    const currAPIKey = getAPIKey();
+    const query = `?apikey=${currAPIKey}&q=${cityName}`;
 
     const res = await fetch(locationBaseUrl + query);
     const tmpCity = await res.json()
@@ -288,14 +298,10 @@ async function getCityByName()
  */
 async function getCityByCoordinates ()
 {
-    if (debug === 1)
-    {
-        console.log(currentCity.latitude);
-        console.log(currentCity.longitude);
-    }
+    const currAPIKey = getAPIKey();
     const locationBaseUrl = "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search";
     const cityCoordinates = currentCity.latitude.toString() + ',' + currentCity.longitude.toString();
-    const query = `?apikey=${APIKey}&q=${cityCoordinates}`;
+    const query = `?apikey=${currAPIKey}&q=${cityCoordinates}`;
 
     const res = await fetch(locationBaseUrl + query);
     const tmpCity = await res.json()
@@ -316,6 +322,7 @@ async function getCityByCoordinates ()
 async function gettingWeatherDetails()
 {
     currentCityForecast = []; //clean the array
+    const currAPIKey = getAPIKey();
 
     //look if already downloaded
     //if not working use getCityHourForecast
@@ -325,7 +332,7 @@ async function gettingWeatherDetails()
     if (found === -1)
     {
         const weatherBaseUrl = "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/";
-        const query = `${currentCity.cityCode}?apikey=${APIKey}`;
+        const query = `${currentCity.cityCode}?apikey=${currAPIKey}`;
         const details = "&details=true"; //needed for get full datas
 
         const res = await fetch(weatherBaseUrl + query + details);

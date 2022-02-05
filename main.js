@@ -4,6 +4,9 @@ const MIL_LON = 5690709.798259557;
 let lat;
 let lon;
 
+//variables used in retrive informations
+const APIKeys = ['b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G'];
+
 // location of MILANO
 var milano = [1026180.4891858436, 5690709.798259557];
 
