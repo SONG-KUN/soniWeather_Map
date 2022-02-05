@@ -19,11 +19,10 @@ const minTemperature = -10;
 const maxRain = 15;
 const maxSnow = 5000; //mm of snow
 
-var citiesNumber = 0;
-var forecastNumber = 0;
+var CitiesNumber = 0;
 
 var cities = []; //array of city coordinates and data
-var citiesForecast = []; //array of city coordinates and data
+var citiesForecast = [[]]; //array of city coordinates and data
 var valueConstraints =
     [
         {
@@ -116,17 +115,6 @@ function mileToKmConverter(value)
 function incToMmConverter(value)
 {
     return value * inchToMm;
-}
-
-/**
- * This function return constraint values for variables
- * @returns {*[]} an array of object with values
- */
-function getDataConstraints()
-{
-    //if no constraints already set, define it
-    if (valueConstraints.length === 0) populateValuesConstraints();
-    return valueConstraints;
 }
 
 /**
@@ -245,14 +233,11 @@ function addNewForecast(fullForecast)
         }
         currentCityForecast.push(tmpHourForecast);
     })
-    citiesForecast[forecastNumber] = currentCityForecast;
-    forecastNumber++;
-
+    citiesForecast.push(currentCityForecast);
     if (debug === 1)
     {
         console.log("CurrentCityForecast")
         console.log(currentCityForecast);
-        console.log("Forecast Number", forecastNumber);
     }
 }
 
@@ -293,8 +278,7 @@ async function getCityByName()
     //unused in further development ATM
     currentCity.latitude = GeoPosition.Latitude;
     currentCity.longitude = GeoPosition.Longitude;
-    cities[citiesNumber] = currentCity;
-    citiesNumber++;
+    cities.push(currentCity);
 }
 
 /**
@@ -321,12 +305,8 @@ async function getCityByCoordinates ()
     //fill our city info
     currentCity.cityName = LocalizedName;
     currentCity.cityCode = Key;
-    cities[citiesNumber] = currentCity;
-    citiesNumber++;
-    if (debug === 1)
-    {
-        console.log(currentCity, citiesNumber);
-    }
+    cities.push(currentCity);
+    if (debug === 1) console.log(currentCity);
 }
 
 /**
