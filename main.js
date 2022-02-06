@@ -5,7 +5,7 @@ let lat;
 let lon;
 
 //variables used in retrive informations
-const APIKeys = ['b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G'];
+const APIKeys = ['b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G' , '39a9a737b07b4b703e3d1cd1e231eedc' , '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'];
 
 // location of MILANO
 var milano = [1026180.4891858436, 5690709.798259557];
