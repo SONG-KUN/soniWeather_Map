@@ -31,10 +31,10 @@
                 <input type = "radio" name = "baseLayerRadioButton" value = "OSMHumanitarian">OSM Humanitarian<br>
                 <input type = "radio" name = "baseLayerRadioButton" value = "StamenTerrain">Stamen Terrain<br>
 
-                <h3>Location:</h3>
-                <button>
-                    <h id = "btn" onclick = "zoomtomilano()">Milano</h>
-                </button>
+                <p class="lead">Enter Your Location</p>
+                <input type="text" id="searchUser" class="form-control" placeholder="Location">
+                <button class="btn-submit" id="submit">Submit</button>
+                
             </div>
         </div>
 
@@ -52,7 +52,6 @@
     <script src = "main.js"></script>
     <script src = "WeatherDataCatcher/dataGetter.js"></script>
     <script src = "SoundDesigner/soundGenerator.js"></script>  <!-- <script src = "SoundDesigner/soundGenerator.js"></script> -->
-<!--    <script src = "temp.js"></script>-->
     <script src = "./libs/v6.9.0-dist/ol.js"></script>
 
 </body>
