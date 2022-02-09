@@ -15,6 +15,7 @@ function sound(weatherParameters) {
 
     let wind = 100;
     let rain = 100;
+    let cloud = 0;
 
     //MAPPING:
     //lon to freq
@@ -37,6 +38,49 @@ function sound(weatherParameters) {
 
     const intervalWind = setInterval(playWind, 10000, wind)
     const intervalRain = setInterval(playRain, 500, rain)
+    const intervalSky  = setInterval(playSky,  2000, cloud)
+
+    function playSky (cloud) {
+        const now = c.currentTime;
+        const o1 = c.createOscillator()
+        const g = c.createGain();
+
+        //DURATION PARAMETERS
+        //duration between 500 and 4000 ms
+        const dur = randomNumber(500, 4000)/1000;
+        const att = dur/10;
+        const dec = dur/5;
+
+        //choose one frequency in the list
+        //CONSONANT
+        const frequencyList = Array(523, 3452, 334, 31, 5346);
+        const freq = frequencyList[Math.floor(Math.random() * frequencyList.length)];
+
+        //Detuning factor linked to the cloud cover
+        const detune = cloud;
+
+        o1.type = "square";
+        o1.frequency.value = freq;
+        o1.detune.value = detune;
+
+        //setting envelope
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.1, now+att);
+        g.gain.linearRampToValueAtTime(0.1, now + dur - dec);
+        g.gain.linearRampToValueAtTime(0, now + dur);
+
+        //CONNECTION
+        o1.connect(g);
+        g.connect(c.destination)
+
+        o1.stop(now+dur)
+
+        if (c.currentTime - startTime > totalDuration)
+        {
+            console.log("time: ", c.currentTime - startTime)
+            clearInterval(intervalSky)
+        }
+    }
 
     function playRain (rain) {
         const now = c.currentTime;
