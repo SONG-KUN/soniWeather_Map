@@ -1,5 +1,3 @@
-let lat;
-let lon;
 
 //variables used in retrive informations
 const APIKeys = ['b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G' , '39a9a737b07b4b703e3d1cd1e231eedc' , '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'];
@@ -7,6 +5,7 @@ const APIKeys = ['b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G' , '39a9a737b07b4b703e3d1cd1e
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
 
+textContent = document.getElementById("content");
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
@@ -163,75 +162,7 @@ document.addEventListener("DOMContentLoaded", function(event)
         
         // Create a click event to call getMapCoordOnClick()
         map.on("click", (e) => getMapCoordOnClick(e));
-        
-        
-        /**
-         * Nominatim is the open-source geocoding with OpenStreetMap data
-         * We apply Nominatim to get the geographic information on Lon&Lat obtained by clicking on the map
-         */
-        map.on('click', function (evt) {
-
-            const coords_click = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
-
-            // MOUSE CLICK: Longitude,Latitude
-            const lon = coords_click[0];
-            const lat = coords_click[1];
-
-            // Data to put in Nominatim url to find address of mouse click location
-            const data_for_url = {lon: lon, lat: lat, format: "json", limit: 1};
-
-            // ENCODED DATA for URL
-            const encoded_data = Object.keys(data_for_url).map(function (k) {
-                return encodeURIComponent(k) + '=' + encodeURIComponent(data_for_url[k])
-            }).join('&');
-
-            // FULL URL for searching address of mouse click
-            const url_nominatim = 'https://nominatim.openstreetmap.org/reverse?' + encoded_data;
-            console.log("URL Request NOMINATIM-Reverse: " + url_nominatim);
-
-            // GET URL REQUEST for ADDRESS
-            httpGet(url_nominatim, function (response_text) {
-
-                // JSON Data of the response to the request Nominatim
-                const data_json = JSON.parse(response_text);
-
-                // Longitude and latitude
-                const res_lon = data_json.lon;
-                const res_lat = data_json.lat;
-
-                // All the information of the address are here
-                const res_address = data_json.address;
-
-                // Manage some details depends on the location, country and places
-                const address_display_name  = data_json.display_name;
-                const address_country       = res_address.country;
-                const address_country_code  = res_address.country_code;
-                const address_postcode      = res_address.postcode;
-                const address_state         = res_address.state;
-                const address_town          = res_address.town;
-                const address_city          = res_address.city;
-                const address_suburb        = res_address.suburb;
-                const address_neighbourhood = res_address.neighbourhood;
-                const address_house_number  = res_address.house_number;
-                const address_road          = res_address.road;
-
-
-                console.log("Longitude    : " + res_lon);
-                console.log("Longitude    : " + res_lat);
-                console.log("Name         : " + address_display_name);
-                console.log("Country      : " + address_country);
-                console.log("Count. Code  : " + address_country_code);
-                console.log("Postcode     : " + address_postcode);
-                console.log("State        : " + address_state);
-                console.log("Town         : " + address_town);
-                console.log("City         : " + address_city);
-                console.log("Suburb       : " + address_suburb);
-                console.log("Neighbourhood: " + address_neighbourhood);
-                console.log("Road         : " + address_road);
-                console.log("House Number : " + address_house_number);
-            });
-        });
-
+               
     }
 
 });
@@ -247,6 +178,12 @@ const getMapCoordOnClick = (evt) => {
     currentCityForecast = []
     currentCity.longitude = lonlat[0];
     currentCity.latitude = lonlat[1];
+    
+    // get the city name when you click on the map
+    const addressINFO = httpGet(lonlat ,function(a){console.log(a)});
+    
+    // display city name on the sidebar
+    populateUI(addressINFO);
 
     //doing the query to get forecast (or load it in current city)
     getCityByCoordinates().then(r => gettingWeatherDetails());
@@ -257,29 +194,46 @@ const getMapCoordOnClick = (evt) => {
 }
 
 
-function httpGet(url, callback_function) {
 
-    const getRequest = new XMLHttpRequest();
-    getRequest.open("get", url, true);
+ /**
+  * Nominatim is the open-source geocoding with OpenStreetMap data
+  * We apply Nominatim to get the geographic information on Lon&Lat obtained by clicking on the map
+  */
 
-    getRequest.addEventListener("readystatechange", function () {
+function httpGet(coords , callback)
+{
+    fetch('http://nominatim.openstreetmap.org/reverse?format=json&lon=' + coords[0] + '&lat=' + coords[1])
+        .then(function(response) {
+            return response.json();
+        }).then(function(info)
+    {
+        // console.log(info);
+        const cityName = info.address.city;
+        // console.log(cityName)
+        callback(cityName)
 
-        // If response is good
-        if (getRequest.readyState === 4 && getRequest.status === 200) {
-
-            // Callback for making stuff with the Nominatim response address
-            callback_function(getRequest.responseText);
-        }
     });
-    
-    // Send the request
-    getRequest.send();
 }
 
 
 
+function populateUI(city)
+{
+    //add them to inner HTML
+    textContent.innerHTML = `
+        <div class="card mx-auto mt-5" style="width: 18rem;">
+            <div class="card-body justify-content-center">
+                <h5 class="card-title">${city}</h5>
+                
+            </div>
+        </div> 
+        `;
+}
 
-
+function clearUI()
+{
+    textContent.innerHTML = "";
+}
 
 
 
