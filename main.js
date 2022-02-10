@@ -5,7 +5,29 @@ const APIKeys = ['b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G' , '39a9a737b07b4b703e3d1cd1e
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
 
-textContent = document.getElementById("content");
+const textContent = document.getElementById("content");
+
+const updateUI = (data) => {
+    const cityDets = data.cityDetails;
+    const weather = data.cityWeather;
+
+    //updating details into HTML
+    textContent.innerHTML = `
+    <h3 class="font-c">${cityDets.EnglishName}</h3>
+    <h3 class="font-c">${weather.WeatherText}</h3>
+    <h2 class="font-c">${weather.Temperature.Metric.Value} &degC</h2>
+  `;
+}
+
+const updateCity = async (city) => {
+    const cityDetails = await getCity(city);
+    const cityWeather = await getWeather(cityDetails.Key);
+
+    return {
+        cityDetails: cityDetails,
+        cityWeather: cityWeather,
+    };
+};
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
@@ -179,13 +201,14 @@ const getMapCoordOnClick = (evt) => {
     currentCity.longitude = lonlat[0];
     currentCity.latitude = lonlat[1];
     
-    // get the city name when you click on the map
+    // get the city name when you click on the map(Represent the city name only on the console, can't print it and call it now)
     const addressINFO = httpGet(lonlat ,function(a){console.log(a)});
     
     // display city name on the sidebar
     populateUI(addressINFO);
 
-    //doing the query to get forecast (or load it in current city)
+    // doing the query to get forecast (or load it in current city)
+    // Also only represent the city name on the console, can't print it and call it now; It's the problem of async and cannot get the OBJECT correctly
     getCityByCoordinates().then(r => gettingWeatherDetails());
     console.log(citiesForecast);
 
@@ -230,10 +253,22 @@ function populateUI(city)
         `;
 }
 
-function clearUI()
-{
-    textContent.innerHTML = "";
-}
+
+
+
+button.addEventListener("click", () => {
+    const city = search.value;
+
+    //updating UI
+    updateCity(city)
+        .then((data) => {
+            updateUI(data);
+        })
+        .catch((err) => console.log(err));
+});
+
+
+
 
 
 
