@@ -6,6 +6,8 @@ const APIKeys = ['b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G' , '39a9a737b07b4b703e3d1cd1e
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
 
 const textContent = document.getElementById("content");
+const search = document.getElementById("searchUser");
+const button = document.getElementById("submit");
 
 const updateUI = (data) => {
     const cityDets = data.cityDetails;
