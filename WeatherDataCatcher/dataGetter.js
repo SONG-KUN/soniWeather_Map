@@ -351,3 +351,21 @@ async function gettingWeatherDetails()
         currentCityForecast = citiesForecast[found];
     }
 }
+
+
+async function getCity(city) {
+        const baseUrl = "http://dataservice.accuweather.com/locations/v1/cities/search";
+        const query = `?apikey=${APIKeys[2]}&q=${city}`;
+        const res = await fetch(baseUrl + query);
+        const data = await res.json();
+        return data[0];
+    }
+
+async function getWeather(id) {
+        const baseUrl = "http://dataservice.accuweather.com/currentconditions/v1/";
+        const query = `${id}?apikey=${APIKeys[2]}`;
+        const res = await fetch(baseUrl + query);
+        const data = await res.json();
+        console.log(data);
+        return data[0];
+    }
