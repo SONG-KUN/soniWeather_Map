@@ -24,13 +24,17 @@
     <div class = "grid-container">
         <div class = "grid-1">
             <div class = "sidebar">
-                <h2>Base Layers</h2>
-                <input type = "radio" name = "baseLayerRadioButton" value = "OSMStandard" checked>OSM standard<br>
-                <input type = "radio" name = "baseLayerRadioButton" value = "OSMHumanitarian">OSM Humanitarian<br>
-                <input type = "radio" name = "baseLayerRadioButton" value = "StamenTerrain">Stamen Terrain<br>
+                <h3>Layer Switcher</h3>
+                    <input type = "radio" name = "baseLayerRadioButton" value = "OSMStandard" checked>OSM standard<br>
+                    <input type = "radio" name = "baseLayerRadioButton" value = "OSMHumanitarian">OSM Humanitarian<br>
+                    <input type = "radio" name = "baseLayerRadioButton" value = "StamenTerrain">Stamen Terrain<br>
 
-                <div id="content"></div>
-                
+                    <br>
+                    <p class="lead">Enter Your Location</p>
+                    <input type="text" id="searchUser" class="form-control" placeholder="Location">
+                    <button class="btn-submit" id="submit">Submit</button>
+
+                    <div id="content"></div> 
             </div>
         </div>
 
