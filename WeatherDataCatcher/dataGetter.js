@@ -358,7 +358,6 @@ async function getCity(city) {
         const query = `?apikey=${APIKeys[2]}&q=${city}`;
         const res = await fetch(baseUrl + query);
         const data = await res.json();
-        console.log(data);
         return data[0];
     }
 
