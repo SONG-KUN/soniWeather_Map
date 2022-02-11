@@ -14,9 +14,10 @@ function sound() {
      */
 
     //ALL VALUE in range [0;100]
-    let wind = 100;
-    let rain = 0;
+    let wind = 0;
+    let rain = 100;
     let cloud = 100;
+
 
     //MAPPING:
     //lon to freq
@@ -29,18 +30,11 @@ function sound() {
     const c = new AudioContext();
     const startTime = c.currentTime;
 
-    // main sound function that lasts eventDur
-    // in this function several functions are called: each function has its duration
-    //for (var i = 0; i < sequence; i++) {
-    //  playNote(freq, dur, dur*i);
-
-    //}
-
-    const intervalWind = setInterval(playWind, 10000, wind)
-    //const intervalRain = setInterval(playRain, 500, rain)
-
     //initial counter
     let skyCounter = 0;
+    let rainCounter = 0;
+    let intervalWind = setInterval(playWind, 10000, wind)
+    let intervalRain = setInterval(playRain, rainCounter, rain)
     let intervalSky = setInterval(playSky, skyCounter, cloud);
 
     function playSky (cloud) {
@@ -53,15 +47,15 @@ function sound() {
         const now = c.currentTime;
 
         //3 oscillator --> triad chord
-        const o1 = c.createOscillator()
-        const o2 = c.createOscillator()
-        const o3 = c.createOscillator()
+        const o1 = c.createOscillator();
+        const o2 = c.createOscillator();
+        const o3 = c.createOscillator();
 
         const g = c.createGain();
 
-        var panner1 = c.createStereoPanner();
-        var panner2 = c.createStereoPanner();
-        var panner3 = c.createStereoPanner();
+        const panner1 = c.createStereoPanner();
+        const panner2 = c.createStereoPanner();
+        const panner3 = c.createStereoPanner();
 
 
         //DURATION PARAMETERS
@@ -156,6 +150,14 @@ function sound() {
     }
 
     function playRain (rain) {
+
+        //clear interval and creat new one
+        clearInterval(intervalRain);
+        //time for another call = duration of the actual one
+        rainCounter = randomNumber(100, 500);
+        intervalRain  = setInterval(playRain,  rainCounter, rain)
+
+
         const now = c.currentTime;
         const o1 = c.createOscillator()
         const o2 = c.createOscillator()
@@ -165,8 +167,8 @@ function sound() {
         //const dur = randomNumber(0.1,0.1);
         const dur = randomNumber(50, 200) / 1000;
         console.log(dur);
-        const att = 0.01;
-        const dec = 0.02;
+        const att = dur/3;
+        const dec = dur/3;
 
         o1.frequency.value = randomNumber(300, 500)
         o2.frequency.value = randomNumber(300, 500)
@@ -192,7 +194,6 @@ function sound() {
         o2.stop(now+dur);
         o3.start(now);
         o3.stop(now+dur);
-        //console.log("note ended", now);
 
         if (c.currentTime - startTime > totalDuration)
         {
@@ -204,8 +205,8 @@ function sound() {
     }
     function playWind (wind) {
         //play with a certain probability according the wind quantity
-        if (randomNumber(0, 100) < wind)
-        {
+        let delayTime;
+        if (randomNumber(0, 100) < wind) {
             //AGGIUNGERE DEC
             //CAPIRE MEGLIO LFO
             //CONTROLLARE FREQ LFO
@@ -213,20 +214,21 @@ function sound() {
 
             //DELAY SECTION
             const delay = c.createDelay(5.0);
-            delay.delayTime.value = 5;
+            const delayTime = randomNumber(10, 30) / 10;
+            delay.delayTime.value = delayTime;
 
             //wind event has a random duration
-            const eventDur = randomNumber(10, 100)/10;
+            const eventDur = randomNumber(10, 100) / 10;
             const att = eventDur / 10;
             const dec = eventDur / 5;
 
             const ampGain = c.createGain();
-            const modGain = c.createGain()
+            const delayGain = c.createGain()
 
             //LFO SECTION
             const lfo = c.createOscillator();
             lfo.type = "triangle";
-            lfo.frequency.value = randomNumber(1,10);
+            lfo.frequency.value = randomNumber(1, 10);
 
             //FILTER SECTION
             const bpf = c.createBiquadFilter();
@@ -234,15 +236,15 @@ function sound() {
             bpf.Q.value = 50;
             const bpfStartFreq = randomNumber(200, 2000);
             const bpfStopFreq = randomNumber(200, 2000);
-            bpf.frequency.setValueAtTime(bpfStartFreq, now );
-            bpf.frequency.linearRampToValueAtTime(bpfStopFreq, now+eventDur );
+            bpf.frequency.setValueAtTime(bpfStartFreq, now);
+            bpf.frequency.linearRampToValueAtTime(bpfStopFreq, now + eventDur);
 
             //PANNING SECTION
             const panner = c.createStereoPanner();
-            const panStart = randomNumber(-10, 10)/10;
-            const panStop = randomNumber(-10, 10)/10;
+            const panStart = randomNumber(-10, 10) / 10;
+            const panStop = randomNumber(-10, 10) / 10;
             panner.pan.setValueAtTime(panStart, now);
-            panner.pan.linearRampToValueAtTime(panStop, now+eventDur );
+            panner.pan.linearRampToValueAtTime(panStop, now + eventDur);
 
             //NOISE SECTION
             const bufferSize = 2 * c.sampleRate,
@@ -257,20 +259,25 @@ function sound() {
 
             //AMPLITUDE SECTION
             ampGain.gain.setValueAtTime(0, now);
-            ampGain.gain.linearRampToValueAtTime(1, now+att);
-            ampGain.gain.linearRampToValueAtTime(1, now+eventDur - dec);
-            ampGain.gain.linearRampToValueAtTime(0, now+eventDur);
+            ampGain.gain.linearRampToValueAtTime(1, now + att);
+            ampGain.gain.linearRampToValueAtTime(1, now + eventDur - dec);
+            ampGain.gain.linearRampToValueAtTime(0, now + eventDur);
+
+            delayGain.gain.setValueAtTime(0, now+delayTime);
+            delayGain.gain.linearRampToValueAtTime(0.5, now + att + delayTime);
+            delayGain.gain.linearRampToValueAtTime(0.5, now + eventDur + delayTime - dec);
+            delayGain.gain.linearRampToValueAtTime(0, now + eventDur + delayTime);
 
             //CONNECTION
             lfo.connect(ampGain.gain);
             //modGain.connect(ampGain);
             whiteNoise.connect(bpf).connect(panner).connect(ampGain).connect(c.destination);
-            ampGain.connect(delay).connect(c.destination);
+            ampGain.connect(delay).connect(delayGain).connect(c.destination);
 
             whiteNoise.start(now);
             lfo.start(now);
-            whiteNoise.stop(now+eventDur);
-            lfo.stop(now+eventDur);
+            whiteNoise.stop(now + eventDur + delay.delayTime.value);
+            lfo.stop(now + eventDur + delay.delayTime.value);
         }
         if (c.currentTime - startTime > totalDuration)
         {
