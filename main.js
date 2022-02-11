@@ -212,10 +212,12 @@ const getMapCoordOnClick = (evt) => {
     // doing the query to get forecast (or load it in current city)
     // Also only represent the city name on the console, can't print it and call it now; It's the problem of async and cannot get the OBJECT correctly
     getCityByCoordinates().then(r => gettingWeatherDetails());
-    console.log(citiesForecast);
+    //console.log('cities', citiesForecast);
 
     // weather params to generate sound; 0 is the current hour, stubbed, returns forecast of 1 hour
-    sound (currentCityForecast[0]);
+    //console.log("current", currentCityForecast[0]);
+    //sound (currentCityForecast[0]);
+    sound();
 }
 
 

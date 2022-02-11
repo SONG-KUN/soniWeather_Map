@@ -1,6 +1,5 @@
 function sound() {
 
-    console.log("sound called")
     /*
     Weather parameters:
     - temperature
@@ -15,7 +14,7 @@ function sound() {
      */
 
     //ALL VALUE in range [0;100]
-    let wind = 50;
+    let wind = 100;
     let rain = 0;
     let cloud = 100;
 
@@ -39,53 +38,94 @@ function sound() {
 
     const intervalWind = setInterval(playWind, 10000, wind)
     //const intervalRain = setInterval(playRain, 500, rain)
-    const intervalSky  = setInterval(playSky,  1000, cloud)
+
+    //initial counter
+    let skyCounter = 0;
+    let intervalSky = setInterval(playSky, skyCounter, cloud);
 
     function playSky (cloud) {
+
+        //clear interval and creat new one
+        clearInterval(intervalSky);
+        //time for another call = duration of the actual one
+        skyCounter = randomNumber(1000, 4000);
+        intervalSky  = setInterval(playSky,  skyCounter, cloud)
         const now = c.currentTime;
+
+        //3 oscillator --> triad chord
         const o1 = c.createOscillator()
+        const o2 = c.createOscillator()
+        const o3 = c.createOscillator()
+
         const g = c.createGain();
+
+        var panner1 = c.createStereoPanner();
+        var panner2 = c.createStereoPanner();
+        var panner3 = c.createStereoPanner();
+
 
         //DURATION PARAMETERS
         //duration between 500 and 4000 ms
-        const dur = randomNumber(2000, 4000)/1000;
-        const att = dur/2;
-        const dec = dur/2;
+        //const dur = randomNumber(2000, 4000)/1000;
+        const dur = (skyCounter/1000) * 1.8;
+        const att = dur/4;
+        const dec = dur/4;
 
-        const maxAmp = 0.1;
+        const maxAmp = 0.01;
 
-        //choose one frequency in the list depending on the cloud covering:
-        // CONSONANT --> clear
-        // DISSONANT --> cloud
-        // more the cloud more the probability of having dissonance
+        panner1.pan.value = randomNumber(-10,10)/10;
+        panner2.pan.value = randomNumber(-10,10)/10;
+        panner3.pan.value = randomNumber(-10,10)/10;
 
-        const octave = Array (-1, 1, 2);
-        const consonantTransposition = Array(0, 4, 5, 7, 8, 9, 12);
-        const dissonantTransposition = Array(1, 2, 3, 6, 10, 11);
-        let note = 48;
-        let midiTranspose = 0;
+        /*
+        choose one chord in the list depending on the cloud covering:
+        CONSONANT --> clear
+        DISSONANT --> cloud
+        more the cloud more the probability of having dissonance
+        */
+        const rootNote = 60;
+        let chord;
+        const consonantChordList =
+            Array
+            (
+                [0, 4, 7],
+                [0, 5, 9],
+                [0, 3, 8],
+                [0, 5, 10],
+                [0, 2, 7],
+                [0, 2, 9],
+                [0, 4, 5]
+            );
+
+        const dissonantChordList =
+            Array(
+                [0, 3, 7],
+                [0, 5, 8],
+                [0, 6, 9],
+                [0, 6, 10],
+                [0, 6, 11],
+                [0, 1, 6],
+                [0, 1, 11]
+            );
 
         if (cloud < randomNumber(0,100))
         {
             //more CLEAR
-            midiTranspose = consonantTransposition[Math.floor(Math.random() * consonantTransposition.length)];
+            chord = consonantChordList[Math.floor(Math.random() * consonantChordList.length)];
         }
         else
         {
             //more CLOUDY
-            midiTranspose = dissonantTransposition[Math.floor(Math.random() * dissonantTransposition.length)];
+            chord = dissonantChordList[Math.floor(Math.random() * dissonantChordList.length)];
         }
 
-        midiTranspose = midiTranspose * octave[Math.floor(Math.random() * octave.length)];
-
-        //Detuning factor linked to the cloud cover
-        //const detune = cloud;
-
         o1.type = "sawtooth";
-        note = note + midiTranspose;
-        console.log (midiTranspose, note);
-        o1.frequency.value = noteToFreq(note);
-        //o1.detune.value = detune;
+        o2.type = "sawtooth";
+        o3.type = "sawtooth";
+
+        o1.frequency.value = noteToFreq(chord[0] + rootNote);
+        o2.frequency.value = noteToFreq(chord[1] + rootNote);
+        o3.frequency.value = noteToFreq(chord[2] + rootNote);
 
         //setting envelope
         g.gain.setValueAtTime(0, now);
@@ -94,11 +134,19 @@ function sound() {
         g.gain.linearRampToValueAtTime(0, now + dur);
 
         //CONNECTION
-        o1.connect(g);
-        g.connect(c.destination);
+        o1.connect(g).connect(panner1).connect(c.destination);
+        o2.connect(g).connect(panner2).connect(c.destination);
+        o3.connect(g).connect(panner3).connect(c.destination);
 
         o1.start(now);
-        o1.stop(now+dur)
+        o2.start(now);
+        o3.start(now);
+
+        o1.stop(now+dur);
+        o2.stop(now+dur);
+        o3.stop(now+dur);
+
+
 
         if (c.currentTime - startTime > totalDuration)
         {
@@ -133,7 +181,6 @@ function sound() {
         g.gain.linearRampToValueAtTime(0.1, now + dur - dec);
         g.gain.linearRampToValueAtTime(0, now + dur);
 
-
         o1.connect(g);
         o2.connect(g);
         o3.connect(g);
@@ -156,37 +203,48 @@ function sound() {
 
     }
     function playWind (wind) {
-        console.log("IN", c.currentTime)
         //play with a certain probability according the wind quantity
         if (randomNumber(0, 100) < wind)
         {
             //AGGIUNGERE DEC
             //CAPIRE MEGLIO LFO
             //CONTROLLARE FREQ LFO
+            const now = c.currentTime;
 
+            //DELAY SECTION
+            const delay = c.createDelay(5.0);
+            delay.delayTime.value = 5;
 
             //wind event has a random duration
             const eventDur = randomNumber(10, 100)/10;
             const att = eventDur / 10;
-            const dec = eventDur / 10;
-            console.log("OK", eventDur)
+            const dec = eventDur / 5;
 
-            const now = c.currentTime;
             const ampGain = c.createGain();
             const modGain = c.createGain()
+
+            //LFO SECTION
             const lfo = c.createOscillator();
-            const bpf = c.createBiquadFilter();
             lfo.type = "triangle";
-            lfo.frequency.value = 5;
-            modGain.gain.value = 2;
+            lfo.frequency.value = randomNumber(1,10);
+
+            //FILTER SECTION
+            const bpf = c.createBiquadFilter();
             bpf.type = "bandpass";
             bpf.Q.value = 50;
-
             const bpfStartFreq = randomNumber(200, 2000);
             const bpfStopFreq = randomNumber(200, 2000);
             bpf.frequency.setValueAtTime(bpfStartFreq, now );
             bpf.frequency.linearRampToValueAtTime(bpfStopFreq, now+eventDur );
 
+            //PANNING SECTION
+            const panner = c.createStereoPanner();
+            const panStart = randomNumber(-10, 10)/10;
+            const panStop = randomNumber(-10, 10)/10;
+            panner.pan.setValueAtTime(panStart, now);
+            panner.pan.linearRampToValueAtTime(panStop, now+eventDur );
+
+            //NOISE SECTION
             const bufferSize = 2 * c.sampleRate,
                 noiseBuffer = c.createBuffer(1, bufferSize, c.sampleRate),
                 output = noiseBuffer.getChannelData(0);
@@ -197,22 +255,22 @@ function sound() {
             whiteNoise.buffer = noiseBuffer;
             whiteNoise.loop = true;
 
+            //AMPLITUDE SECTION
             ampGain.gain.setValueAtTime(0, now);
             ampGain.gain.linearRampToValueAtTime(1, now+att);
             ampGain.gain.linearRampToValueAtTime(1, now+eventDur - dec);
             ampGain.gain.linearRampToValueAtTime(0, now+eventDur);
 
+            //CONNECTION
             lfo.connect(ampGain.gain);
             //modGain.connect(ampGain);
-            whiteNoise.connect(bpf);
-            bpf.connect(ampGain);
-            ampGain.connect(c.destination)
+            whiteNoise.connect(bpf).connect(panner).connect(ampGain).connect(c.destination);
+            ampGain.connect(delay).connect(c.destination);
 
             whiteNoise.start(now);
             lfo.start(now);
             whiteNoise.stop(now+eventDur);
             lfo.stop(now+eventDur);
-            //interesting to add the wind direction in stereo mode
         }
         if (c.currentTime - startTime > totalDuration)
         {
@@ -220,7 +278,6 @@ function sound() {
             clearInterval(intervalWind)
         }
     }
-
 
     function playNote (freq, dur, time) {
         const now = c.currentTime;
@@ -245,7 +302,6 @@ function sound() {
 }
 
 //UTILITY
-
 //scale value from one domain to another
 function scale (number, inMin, inMax, outMin, outMax) {
     return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
@@ -258,9 +314,10 @@ function randomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function noteToFreq(note) {
+// Convert midi to freq
+function noteToFreq(midiNote) {
     let a = 440; //standard frequency of A (common value is 440Hz)
-    return (a / 32) * (2 ** ((note - 9) / 12));
+    return (a / 32) * (2 ** ((midiNote - 9) / 12));
 }
 
 
