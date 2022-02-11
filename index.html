@@ -13,14 +13,7 @@
 </head>
 
 <body>
-
-<!--    <div id = "layers">-->
-<!--        <h1>layers</h1>-->
-<!--        <button>-->
-<!--            <h2 id = "btn" onclick = "zoomtomilano()">Milano</h2>-->
-<!--        </button>-->
-<!--    </div>-->
-
+    
     <div class = "grid-container">
         <div class = "grid-1">
             <div class = "sidebar">
@@ -29,12 +22,17 @@
                     <input type = "radio" name = "baseLayerRadioButton" value = "OSMHumanitarian">OSM Humanitarian<br>
                     <input type = "radio" name = "baseLayerRadioButton" value = "StamenTerrain">Stamen Terrain<br>
 
-                    <br>
-                    <p class="lead">Enter Your Location</p>
-                    <input type="text" id="searchUser" class="form-control" placeholder="Location">
+                    <br><br>
+                    <h3 class="lead">Search Bar</h3>
+                    <input type="text" id="searchUser" class="form-control" placeholder="Enter Your Location">
                     <button class="btn-submit" id="submit">Submit</button>
+                    <div id="content"></div>
 
-                    <div id="content"></div> 
+                    <br>
+                    <!-- Image -->
+                    <div class="image">
+                        <img src="" />
+                    </div>
             </div>
         </div>
 
