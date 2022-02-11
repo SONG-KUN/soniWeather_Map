@@ -1,13 +1,14 @@
 
 //variables used in retrive informations
-const APIKeys = ['b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G' , '39a9a737b07b4b703e3d1cd1e231eedc' , '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'];
+const APIKeys = ['b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G' , '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'];
 
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
 
 const textContent = document.getElementById("content");
 const search = document.getElementById("searchUser");
-const button = document.getElementById("submit");
+const weatherButton = document.getElementById("submit");
+const image = document.querySelector(".image img");
 
 const updateUI = (data) => {
     const cityDets = data.cityDetails;
@@ -19,6 +20,11 @@ const updateUI = (data) => {
     <h3 class="font-c">${weather.WeatherText}</h3>
     <h2 class="font-c">${weather.Temperature.Metric.Value} &degC</h2>
   `;
+    
+    //updating image
+    let imgSrc = null;
+    imgSrc = "/data/WeatherIcons/" + weather.WeatherIcon + ".png";
+    image.setAttribute("src", imgSrc);
 }
 
 const updateCity = async (city) => {
@@ -260,7 +266,7 @@ function populateUI(city)
 
 
 
-button.addEventListener("click", () => {
+weatherButton.addEventListener("click", () => {
     const city = search.value;
 
     //updating UI
