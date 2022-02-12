@@ -1,3 +1,6 @@
+/**
+ * Sound generator
+ */
 function sound() {
 
     /*
@@ -37,6 +40,10 @@ function sound() {
     let intervalRain = setInterval(playRain, rainCounter, rain)
     let intervalSky = setInterval(playSky, skyCounter, cloud);
 
+    /**
+     * Cloud sound generator
+     * @param cloud cloud cover value
+     */
     function playSky (cloud) {
 
         //clear interval and creat new one
@@ -149,6 +156,10 @@ function sound() {
         }
     }
 
+    /**
+     * Rain sound generator
+     * @param rain forecast of rain
+     */
     function playRain (rain) {
 
         //clear interval and creat new one
@@ -203,6 +214,11 @@ function sound() {
 
 
     }
+
+    /**
+     * Function generator for wind sound
+     * @param wind forecast wind value
+     */
     function playWind (wind) {
         //play with a certain probability according the wind quantity
         let delayTime;
@@ -286,6 +302,12 @@ function sound() {
         }
     }
 
+    /**
+     * Function to play a note
+     * @param freq frequency of sound
+     * @param dur duration of sound
+     * @param time base time
+     */
     function playNote (freq, dur, time) {
         const now = c.currentTime;
         const o = c.createOscillator()
@@ -309,19 +331,36 @@ function sound() {
 }
 
 //UTILITY
-//scale value from one domain to another
+/**
+ * scale value from one domain to another
+ * @param number base number
+ * @param inMin begin min value
+ * @param inMax begin max value
+ * @param outMin final min value
+ * @param outMax final max value
+ * @returns {*} the scale value
+ */
 function scale (number, inMin, inMax, outMin, outMax) {
     return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
 
-// Function to generate random number
+/**
+ * Function to generate random number
+ * @param min lower bound
+ * @param max upper bound
+ * @returns {number}
+ */
 function randomNumber(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Convert midi to freq
+/**
+ * Convert midi to freq
+ * @param midiNote midi note in input
+ * @returns {number} the frequency note
+ */
 function noteToFreq(midiNote) {
     let a = 440; //standard frequency of A (common value is 440Hz)
     return (a / 32) * (2 ** ((midiNote - 9) / 12));

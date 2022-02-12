@@ -282,13 +282,20 @@ async function getCityByName()
     const res = await fetch(locationBaseUrl + query);
     const tmpCity = await res.json()
 
-    const {GeoPosition, Key} = tmpCity;
+    if(debug === 1)
+    {
+        console.log("City by name\n");
+        console.log(tmpCity);
+    }
+
+    const {GeoPosition, Key} = tmpCity[0];
     //fill our city info
     currentCity.cityCode = Key;
     //unused in further development ATM
     currentCity.latitude = GeoPosition.Latitude;
     currentCity.longitude = GeoPosition.Longitude;
     cities.push(currentCity);
+    if (debug === 1) console.log(currentCity);
 }
 
 /**
@@ -352,7 +359,11 @@ async function gettingWeatherDetails()
     }
 }
 
-
+/**
+ * Fastest way to get the city
+ * @param city city values
+ * @returns {Promise<*>}
+ */
 async function getCity(city) {
         const baseUrl = "http://dataservice.accuweather.com/locations/v1/cities/search";
         const query = `?apikey=${APIKeys[2]}&q=${city}`;
@@ -361,6 +372,11 @@ async function getCity(city) {
         return data[0];
     }
 
+/**
+ * Direct function to retrieve weather
+ * @param id
+ * @returns {Promise<*>}
+ */
 async function getWeather(id) {
         const baseUrl = "http://dataservice.accuweather.com/currentconditions/v1/";
         const query = `${id}?apikey=${APIKeys[2]}`;

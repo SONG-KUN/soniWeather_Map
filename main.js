@@ -10,6 +10,10 @@ const search = document.getElementById("searchUser");
 const weatherButton = document.getElementById("submit");
 const image = document.querySelector(".image img");
 
+/**
+ * Function used to update all ui functions about city and weather forecast and icon
+ * @param data
+ */
 const updateUI = (data) => {
     const cityDets = data.cityDetails;
     const weather = data.cityWeather;
@@ -27,6 +31,11 @@ const updateUI = (data) => {
     image.setAttribute("src", imgSrc);
 }
 
+/**
+ * City updater
+ * @param city city we need for calling function
+ * @returns {Promise<{cityDetails: *, cityWeather: *}>}
+ */
 const updateCity = async (city) => {
     const cityDetails = await getCity(city);
     const cityWeather = await getWeather(cityDetails.Key);
@@ -37,6 +46,9 @@ const updateCity = async (city) => {
     };
 };
 
+/**
+ * Click event listener
+ */
 document.addEventListener("DOMContentLoaded", function(event)
 {
     // view
@@ -199,7 +211,10 @@ document.addEventListener("DOMContentLoaded", function(event)
 
 
 
-// Get the weather info when click on the map
+/**
+ * Get the weather info when click on the map
+ * @param evt click event
+ */
 const getMapCoordOnClick = (evt) => {
     //tuple of coordinates
     const lonlat = ol.proj.toLonLat(evt.coordinate);
@@ -232,7 +247,6 @@ const getMapCoordOnClick = (evt) => {
   * Nominatim is the open-source geocoding with OpenStreetMap data
   * We apply Nominatim to get the geographic information on Lon&Lat obtained by clicking on the map
   */
-
 function httpGet(coords , callback)
 {
     fetch('http://nominatim.openstreetmap.org/reverse?format=json&lon=' + coords[0] + '&lat=' + coords[1])
@@ -249,7 +263,10 @@ function httpGet(coords , callback)
 }
 
 
-
+/**
+ * Function used to populate the UI section of city
+ * @param city city used to populate the param
+ */
 function populateUI(city)
 {
     //add them to inner HTML
@@ -264,11 +281,14 @@ function populateUI(city)
 }
 
 
-
-
+/**
+ * Function event on click on search button
+ */
 weatherButton.addEventListener("click", () => {
     const city = search.value;
-
+    currentCity.cityName = city;
+    getCityByName();
+    console.log(city);
     //updating UI
     updateCity(city)
         .then((data) => {
