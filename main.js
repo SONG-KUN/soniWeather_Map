@@ -1,6 +1,6 @@
 
 //variables used in retrive informations
-const APIKeys = ['b0G0rFd66TFZJFtg7Zc2zWFLtfszoQ1G' , '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'];
+const APIKeys = ['Ng3bABWw43xZjwuKTGvh3FN74E8zfsoA' , '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'];
 
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
@@ -10,41 +10,6 @@ const search = document.getElementById("searchUser");
 const weatherButton = document.getElementById("submit");
 const image = document.querySelector(".image img");
 
-/**
- * Function used to update all ui functions about city and weather forecast and icon
- * @param data
- */
-const updateUI = (data) => {
-    const cityDets = data.cityDetails;
-    const weather = data.cityWeather;
-
-    //updating details into HTML
-    textContent.innerHTML = `
-    <h3 class="font-c">${cityDets.EnglishName}</h3>
-    <h3 class="font-c">${weather.WeatherText}</h3>
-    <h2 class="font-c">${weather.Temperature.Metric.Value} &degC</h2>
-  `;
-    
-    //updating image
-    let imgSrc = null;
-    imgSrc = "/data/WeatherIcons/" + weather.WeatherIcon + ".png";
-    image.setAttribute("src", imgSrc);
-}
-
-/**
- * City updater
- * @param city city we need for calling function
- * @returns {Promise<{cityDetails: *, cityWeather: *}>}
- */
-const updateCity = async (city) => {
-    const cityDetails = await getCity(city);
-    const cityWeather = await getWeather(cityDetails.Key);
-
-    return {
-        cityDetails: cityDetails,
-        cityWeather: cityWeather,
-    };
-};
 
 /**
  * Click event listener
@@ -210,7 +175,6 @@ document.addEventListener("DOMContentLoaded", function(event)
 });
 
 
-
 /**
  * Get the weather info when click on the map
  * @param evt click event
@@ -226,20 +190,30 @@ const getMapCoordOnClick = (evt) => {
     
     // get the city name when you click on the map(Represent the city name only on the console, can't print it and call it now)
     const addressINFO = httpGet(lonlat ,function(a){console.log(a)});
-    
+
     // display city name on the sidebar
     populateUI(addressINFO);
 
     // doing the query to get forecast (or load it in current city)
     // Also only represent the city name on the console, can't print it and call it now; It's the problem of async and cannot get the OBJECT correctly
-    getCityByCoordinates().then(r => gettingWeatherDetails());
+    getCityByCoordinates().then(r => gettingWeatherDetails()).then(updateUI).catch();
+
     //console.log('cities', citiesForecast);
 
     // weather params to generate sound; 0 is the current hour, stubbed, returns forecast of 1 hour
     //console.log("current", currentCityForecast[0]);
-    //sound (currentCityForecast[0]);
     sound();
 }
+
+/**
+ * Function event on click on search button
+ */
+weatherButton.addEventListener("click", () => {
+    currentCity.cityName = search.value;
+    getCityByName().then(r => gettingWeatherDetails()).then(updateUI).catch((err) => console.log(err));
+    console.log(citiesForecast);
+    console.log(cities);
+});
 
 
 
@@ -282,20 +256,32 @@ function populateUI(city)
 
 
 /**
- * Function event on click on search button
+ * Function used to update all ui functions about city and weather forecast and icon
  */
-weatherButton.addEventListener("click", () => {
-    const city = search.value;
-    currentCity.cityName = city;
-    getCityByName();
-    console.log(city);
-    //updating UI
-    updateCity(city)
-        .then((data) => {
-            updateUI(data);
-        })
-        .catch((err) => console.log(err));
-});
+const updateUI = () => {
+    const weather = getCityHourForecast(0);
+    console.log(currentCity);
+    console.log(weather);
+
+    //updating details into HTML
+    textContent.innerHTML = `
+    <h3 class="font-c">${currentCity.cityName}</h3>
+    <h3 class="font-c">${weather.iconPhrase}</h3>
+    <h4 class="font-c">${"Temperature: " + weather.temperatureValue.toFixed(1)} &degC</h4>
+    <h4 class="font-c">${"Humidity: " + weather.relativeHumidity.toFixed(1)} &percnt;</h4>
+    <h4 class="font-c">${"Wind Speed: " + weather.windSpeed.toFixed(1) + " km/h"};</h4>
+    <h4 class="font-c">${"Cloud Cover: " + weather.cloudCover.toFixed(1)} &percnt;</h4>
+    <h4 class="font-c">${"Rain Probability: " + weather.rainProbability.toFixed(1)} &percnt;</h4>
+    <h4 class="font-c">${"Snow Probability: " + weather.snowProbability.toFixed(1)} &percnt;</h4>
+  `;
+
+    //updating image
+    let imgSrc = null;
+    imgSrc = "/data/WeatherIcons/" + weather.iconNumber + ".png";
+    image.setAttribute("src", imgSrc);
+}
+
+
 
 
 

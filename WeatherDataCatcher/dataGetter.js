@@ -3,7 +3,7 @@
  * This class is used to get weather forecast from AccuWeather using the website free (but limited) APIs
  * Tose information will be turned to the music generator
  */
-var debug = 1; //debug variable used to
+var debug = 0; //debug variable used to
 
 const inchToMm = 25.4; //1 inch = 25.4 mm
 const mileToKm = 1.60934; //1 mile = 1.60934 Km
@@ -242,7 +242,7 @@ function addNewForecast(fullForecast)
         }
         currentCityForecast.push(tmpHourForecast);
     })
-    citiesForecast.push(currentCityForecast);
+    Array.prototype.push.apply(citiesForecast, currentCityForecast);
     if (debug === 1)
     {
         console.log("CurrentCityForecast")
@@ -254,17 +254,12 @@ function addNewForecast(fullForecast)
 /**
  * Used to retrieve the forecast of a specific hour of a specific city
  * @requires city forecast already retrieved from internet
- * @param cityCode is the city code used for search the city
  * @param hour is the hour [0-11] of forecast we will read
  * @returns {weatherForecast} all features of an hour weather forecast
  */
-function getCityHourForecast(cityCode, hour)
+function getCityHourForecast(hour)
 {
-    for(let i = 0; i < citiesForecast.length; i++)
-    {
-        if (citiesForecast[i][hour].cityCode === cityCode)
-            return citiesForecast[i][hour].cityCode;
-    }
+    return currentCityForecast[hour];
 }
 
 /**
@@ -358,30 +353,3 @@ async function gettingWeatherDetails()
         currentCityForecast = citiesForecast[found];
     }
 }
-
-/**
- * Fastest way to get the city
- * @param city city values
- * @returns {Promise<*>}
- */
-async function getCity(city) {
-        const baseUrl = "http://dataservice.accuweather.com/locations/v1/cities/search";
-        const query = `?apikey=${APIKeys[2]}&q=${city}`;
-        const res = await fetch(baseUrl + query);
-        const data = await res.json();
-        return data[0];
-    }
-
-/**
- * Direct function to retrieve weather
- * @param id
- * @returns {Promise<*>}
- */
-async function getWeather(id) {
-        const baseUrl = "http://dataservice.accuweather.com/currentconditions/v1/";
-        const query = `${id}?apikey=${APIKeys[2]}`;
-        const res = await fetch(baseUrl + query);
-        const data = await res.json();
-        console.log(data);
-        return data[0];
-    }
