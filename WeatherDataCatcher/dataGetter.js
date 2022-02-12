@@ -10,44 +10,46 @@ const mileToKm = 1.60934; //1 mile = 1.60934 Km
 const FToC = 5/9; //conversion for Farenheit to Celsius
 
 //constant variable limits
-const maxWind = 100;
-const flatValue = 0;
-const maxPercentage = 100;
-const maxTemperature = 40;
-const minTemperature = -10;
-const maxRain = 15;
-const maxSnow = 5000; //mm of snow
+class constraints
+{
+    maxWind = 100;
+    flatValue = 0;
+    maxPercentage = 100;
+    maxTemperature = 40;
+    minTemperature = -10;
+    maxRain = 15;
+    maxSnow = 5000; //mm of snow
+}
 
-var CitiesNumber = 0;
 
 var cities = []; //array of city coordinates and data
 var citiesForecast = []; //array of city coordinates and data
-var valueConstraints =
+const valueConstraints =
     [
         {
             "valueName" : "Percentage",
-            "maxValue"  : maxPercentage,
-            "minValue"  : flatValue
+            "maxValue"  : constraints.prototype.maxPercentage,
+            "minValue"  : constraints.prototype.flatValue
         },
         {
             "valueName" : "Temperature",
-            "maxValue"  : maxTemperature,
-            "minValue"  : minTemperature
+            "maxValue"  : constraints.prototype.maxTemperature,
+            "minValue"  : constraints.prototype.minTemperature
         },
         {
             "valueName" : "Wind",
-            "maxValue"  : maxWind,
-            "minValue"  : flatValue
+            "maxValue"  : constraints.prototype.maxWind,
+            "minValue"  : constraints.prototype.flatValue
         },
         {
             "valueName" : "Rain",
-            "maxValue"  : maxRain,
-            "minValue"  : flatValue
+            "maxValue"  : constraints.prototype.maxRain,
+            "minValue"  : constraints.prototype.flatValue
         },
         {
             "valueName" : "Snow",
-            "maxValue"  : maxSnow,
-            "minValue"  : flatValue
+            "maxValue"  : constraints.prototype.maxSnow,
+            "minValue"  : constraints.prototype.flatValue
         }
     ];
 
