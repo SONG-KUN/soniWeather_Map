@@ -198,8 +198,6 @@ const getMapCoordOnClick = (evt) => {
     // Also only represent the city name on the console, can't print it and call it now; It's the problem of async and cannot get the OBJECT correctly
     getCityByCoordinates().then(r => gettingWeatherDetails()).then(updateUI).catch();
 
-    //console.log('cities', citiesForecast);
-
     // weather params to generate sound; 0 is the current hour, stubbed, returns forecast of 1 hour
     //console.log("current", currentCityForecast[0]);
     sound();
@@ -211,8 +209,6 @@ const getMapCoordOnClick = (evt) => {
 weatherButton.addEventListener("click", () => {
     currentCity.cityName = search.value;
     getCityByName().then(r => gettingWeatherDetails()).then(updateUI).catch((err) => console.log(err));
-    console.log(citiesForecast);
-    console.log(cities);
 });
 
 
@@ -260,8 +256,8 @@ function populateUI(city)
  */
 const updateUI = () => {
     const weather = getCityHourForecast(0);
-    console.log(currentCity);
-    console.log(weather);
+    if (debug === 1) console.log(currentCity);
+    if (debug === 1) console.log(weather);
 
     //updating details into HTML
     textContent.innerHTML = `
