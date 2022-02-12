@@ -171,11 +171,11 @@ function addNewForecast(fullForecast)
                 tmpHourForecast.temperatureValue = temperatureConverter(hourWeather.Temperature.Value);
             else tmpHourForecast.temperatureValue = Temperature.Value;
             //temperature
-            if (tmpHourForecast.temperatureValue >= maxTemperature) {
-                tmpHourForecast.temperatureValue = maxTemperature
+            if (tmpHourForecast.temperatureValue >= constraints.prototype.maxTemperature) {
+                tmpHourForecast.temperatureValue = constraints.prototype.maxTemperature
             }   //double	Rounded value in specified units. May be NULL.;
-            else if (tmpHourForecast.temperatureValue < minTemperature)
-                tmpHourForecast.temperatureValue = minTemperature;
+            else if (tmpHourForecast.temperatureValue < constraints.prototype.minTemperature)
+                tmpHourForecast.temperatureValue = constraints.prototype.minTemperature;
         }
 
         //humidity
@@ -195,8 +195,8 @@ function addNewForecast(fullForecast)
             else
                 tmpHourForecast.rainValue = hourWeather.Rain.Value;
 
-            if (tmpHourForecast.rainValue > maxRain)
-                tmpHourForecast.rainValue = maxRain;
+            if (tmpHourForecast.rainValue > constraints.prototype.maxRain)
+                tmpHourForecast.rainValue = constraints.prototype.maxRain;
         }
 
         //snow probability
@@ -214,8 +214,8 @@ function addNewForecast(fullForecast)
             else
                 tmpHourForecast.snowValue = hourWeather.Snow.Value;
 
-            if (tmpHourForecast.snowValue > maxSnow)
-                tmpHourForecast.snowValue = maxSnow;
+            if (tmpHourForecast.snowValue > constraints.prototype.maxSnow)
+                tmpHourForecast.snowValue = constraints.prototype.maxSnow;
         }
 
         //cloud cover
@@ -234,8 +234,8 @@ function addNewForecast(fullForecast)
             else
                 tmpHourForecast.windSpeed = fullForecast.Wind.Speed.Value;
 
-            if (tmpHourForecast.windSpeed > maxWind)
-                tmpHourForecast.windSpeed = maxWind;
+            if (tmpHourForecast.windSpeed > constraints.prototype.maxWind)
+                tmpHourForecast.windSpeed = constraints.prototype.maxWind;
         }
         if (debug === 1)
         {
@@ -255,7 +255,6 @@ function addNewForecast(fullForecast)
 
 /**
  * Used to retrieve the forecast of a specific hour of a specific city
- * @requires city forecast already retrieved from internet
  * @param hour is the hour [0-11] of forecast we will read
  * @returns {weatherForecast} all features of an hour weather forecast
  */

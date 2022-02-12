@@ -10,6 +10,7 @@ const search = document.getElementById("searchUser");
 const weatherButton = document.getElementById("submit");
 const image = document.querySelector(".image img");
 
+var hour = 0;
 
 /**
  * Click event listener
@@ -171,7 +172,6 @@ document.addEventListener("DOMContentLoaded", function(event)
         map.on("click", (e) => getMapCoordOnClick(e));
                
     }
-
 });
 
 
