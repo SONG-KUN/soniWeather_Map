@@ -3,6 +3,7 @@
  * This class is used to get weather forecast from AccuWeather using the website free (but limited) APIs
  * Tose information will be turned to the music generator
  */
+
 var debug = 0; //debug variable used to
 
 const inchToMm = 25.4; //1 inch = 25.4 mm
@@ -18,9 +19,8 @@ class constraints
     minTemperature = -10;
     maxRain = 15;
     maxSnow = 5000; //mm of snow
-    maxPercentage = 100;
     //humidity and cloud are %
-
+    maxPercentage = 100;
 }
 
 
@@ -86,7 +86,6 @@ class city
         this.longitude = lon; // [-180.0 ; 180.0]
     }
 }
-
 var currentCity = new city();
 var currentCityForecast = []; //array of forecast of 12 hours
 
@@ -138,12 +137,17 @@ function incToMmConverter(value)
 /**
  * Resets current city value
  */
-function currentCityCleaner()
+function cleanCurrentCity()
 {
     currentCity.cityCode = 0;
     currentCity.cityName = null;
     currentCity.longitude = 0;
     currentCity.latitude = 0;
+}
+
+function clearCurrentCityForecast()
+{
+    currentCityForecast = [];
 }
 
 /**
@@ -253,7 +257,6 @@ function addNewForecast(fullForecast)
         console.log(currentCityForecast);
     }
 }
-
 
 /**
  * Used to retrieve the forecast of a specific hour of a specific city

@@ -1,6 +1,7 @@
 /**
  * Sound generator
  */
+
 function sound() {
 
     /*
@@ -15,24 +16,26 @@ function sound() {
      */
 
     //RETRIEVE off WEATHER PARAMETERS - ALL VALUE SCALED in [0;100]
-    const hour = 0;
+    let soundWeather = getCityHourForecast(hour);
+    console.log("GET NEW VALUEEEEE");
+    console.log(soundWeather);
 
-    let wind = getCityHourForecast(hour).windSpeed;
+    let wind = soundWeather.windSpeed;
     wind = scale(wind, 0, constraints.prototype.maxWind, 0, 100);
 
-    let rain = getCityHourForecast(hour).rainValue;
+    let rain = soundWeather.rainValue;
     rain = scale(rain, 0, constraints.prototype.maxRain, 0, 100);
 
-    let snow = getCityHourForecast(hour).snowValue;
+    let snow = soundWeather.snowValue;
     snow = scale(snow, 0, constraints.prototype.maxSnow, 0, 100);
 
-    let temperature = getCityHourForecast(hour).temperatureValue;
+    let temperature = soundWeather.temperatureValue;
     temperature = scale(temperature, constraints.prototype.minTemperature, constraints.prototype.maxTemperature, 0, 100);
 
     //all %
-    const humidity = getCityHourForecast(hour).relativeHumidity;
-    const cloud = getCityHourForecast(hour).cloudCover;
-    const rainProb = getCityHourForecast(hour).rainProbability;
+    const humidity =soundWeather.relativeHumidity;
+    const cloud = soundWeather.cloudCover;
+    const rainProb = soundWeather.rainProbability;
 
     // duration of the entire event (maybe 1 min?)
     let totalDuration = 60;      //secs
@@ -219,7 +222,7 @@ function sound() {
         o3.connect(g);
         g.connect(c.destination)
 
-        whiteNoise.connect(lpf).connect(whiteNoise)
+        //whiteNoise.connect(lpf).connect(whiteNoise)
 
         o1.start(now);
         o1.stop(now+dur);

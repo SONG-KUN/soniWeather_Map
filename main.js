@@ -1,6 +1,6 @@
 
 //variables used in retrive informations
-const APIKeys = ['Ng3bABWw43xZjwuKTGvh3FN74E8zfsoA' , '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'];
+const APIKeys = ['U876fB5Dr4lvY2xZDGAJ3MsHw1QuED48' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
 
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
@@ -11,6 +11,8 @@ const weatherButton = document.getElementById("submit");
 const image = document.querySelector(".image img");
 
 var hour = 0;
+var weather;
+let decimals = 1;
 
 /**
  * Click event listener
@@ -174,7 +176,6 @@ document.addEventListener("DOMContentLoaded", function(event)
     }
 });
 
-
 /**
  * Get the weather info when click on the map
  * @param evt click event
@@ -183,24 +184,16 @@ const getMapCoordOnClick = (evt) => {
     //tuple of coordinates
     const lonlat = ol.proj.toLonLat(evt.coordinate);
     //prepare clean ambient
-    currentCityCleaner();
-    currentCityForecast = []
+    clearCurrentCityForecast();
+    cleanCurrentCity()
+
     currentCity.longitude = lonlat[0];
     currentCity.latitude = lonlat[1];
     
-    // get the city name when you click on the map(Represent the city name only on the console, can't print it and call it now)
-    const addressINFO = httpGet(lonlat ,function(a){console.log(a)});
-
-    // display city name on the sidebar
-    populateUI(addressINFO);
-
     // doing the query to get forecast (or load it in current city)
     // Also only represent the city name on the console, can't print it and call it now; It's the problem of async and cannot get the OBJECT correctly
-    getCityByCoordinates().then(r => gettingWeatherDetails()).then(updateUI).catch();
-
+    getCityByCoordinates().then(playSound);
     // weather params to generate sound; 0 is the current hour, stubbed, returns forecast of 1 hour
-    //console.log("current", currentCityForecast[0]);
-    sound();
 }
 
 /**
@@ -208,67 +201,34 @@ const getMapCoordOnClick = (evt) => {
  */
 weatherButton.addEventListener("click", () => {
     currentCity.cityName = search.value;
-    getCityByName().then(r => gettingWeatherDetails()).then(updateUI).catch((err) => console.log(err));
+    getCityByName().then(clearCurrentCityForecast).then(playSound);
 });
 
-
-
- /**
-  * Nominatim is the open-source geocoding with OpenStreetMap data
-  * We apply Nominatim to get the geographic information on Lon&Lat obtained by clicking on the map
-  */
-function httpGet(coords , callback)
-{
-    fetch('http://nominatim.openstreetmap.org/reverse?format=json&lon=' + coords[0] + '&lat=' + coords[1])
-        .then(function(response) {
-            return response.json();
-        }).then(function(info)
-    {
-        // console.log(info);
-        const cityName = info.address.city;
-        // console.log(cityName)
-        callback(cityName)
-
-    });
-}
-
-
 /**
- * Function used to populate the UI section of city
- * @param city city used to populate the param
+ * Function to execute the sounds, can become multithread.
  */
-function populateUI(city)
+function playSound()
 {
-    //add them to inner HTML
-    textContent.innerHTML = `
-        <div class="card mx-auto mt-5" style="width: 18rem;">
-            <div class="card-body justify-content-center">
-                <h5 class="card-title">${city}</h5>
-                
-            </div>
-        </div> 
-        `;
+    gettingWeatherDetails().then(sound).then(updateUI).catch((err) => console.log(err));
 }
-
 
 /**
  * Function used to update all ui functions about city and weather forecast and icon
  */
 const updateUI = () => {
-    const weather = getCityHourForecast(0);
-    if (debug === 1) console.log(currentCity);
-    if (debug === 1) console.log(weather);
+    weather = getCityHourForecast(hour);
+    //console.log(weather);
 
     //updating details into HTML
     textContent.innerHTML = `
     <h3 class="font-c">${currentCity.cityName}</h3>
     <h3 class="font-c">${weather.iconPhrase}</h3>
-    <h4 class="font-c">${"Temperature: " + weather.temperatureValue.toFixed(1)} &degC</h4>
-    <h4 class="font-c">${"Humidity: " + weather.relativeHumidity.toFixed(1)} &percnt;</h4>
-    <h4 class="font-c">${"Wind Speed: " + weather.windSpeed.toFixed(1) + " km/h"};</h4>
-    <h4 class="font-c">${"Cloud Cover: " + weather.cloudCover.toFixed(1)} &percnt;</h4>
-    <h4 class="font-c">${"Rain Probability: " + weather.rainProbability.toFixed(1)} &percnt;</h4>
-    <h4 class="font-c">${"Snow Probability: " + weather.snowProbability.toFixed(1)} &percnt;</h4>
+    <h4 class="font-c">${"Temperature: " + weather.temperatureValue.toFixed(decimals)} &degC</h4>
+    <h4 class="font-c">${"Humidity: " + weather.relativeHumidity.toFixed(decimals)} &percnt;</h4>
+    <h4 class="font-c">${"Wind Speed: " + weather.windSpeed.toFixed(decimals) + " km/h"};</h4>
+    <h4 class="font-c">${"Cloud Cover: " + weather.cloudCover.toFixed(decimals)} &percnt;</h4>
+    <h4 class="font-c">${"Rain Probability: " + weather.rainProbability.toFixed(decimals)} &percnt;</h4>
+    <h4 class="font-c">${"Snow Probability: " + weather.snowProbability.toFixed(decimals)} &percnt;</h4>
   `;
 
     //updating image
@@ -276,15 +236,6 @@ const updateUI = () => {
     imgSrc = "/data/WeatherIcons/" + weather.iconNumber + ".png";
     image.setAttribute("src", imgSrc);
 }
-
-
-
-
-
-
-
-
-
 
 
 
