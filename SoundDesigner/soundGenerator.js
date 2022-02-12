@@ -10,23 +10,29 @@ function sound() {
     - humidity
     - wind          //range:
     - cloud cover
-
     ?- air quality
     ?- Main Condition: clear, cloudy, rainy
-
      */
 
-    //ALL VALUE in range [0;100]
-    let wind = 0;
-    let rain = 100;
-    let cloud = 100;
+    //RETRIEVE off WEATHER PARAMETERS - ALL VALUE SCALED in [0;100]
+    const hour = 0;
 
+    let wind = getCityHourForecast(hour).windSpeed;
+    wind = scale(wind, 0, constraints.prototype.maxWind, 0, 100);
 
-    //MAPPING:
-    //lon to freq
-    //let freq = scale(weatherParameters[0], -180, 180, 100, 1000)
-    //lat to duration
-    //let dur = scale(weatherParameters[1], -90, 90, 0.1, 1)
+    let rain = getCityHourForecast(hour).rainValue;
+    rain = scale(rain, 0, constraints.prototype.maxRain, 0, 100);
+
+    let snow = getCityHourForecast(hour).snowValue;
+    snow = scale(snow, 0, constraints.prototype.maxSnow, 0, 100);
+
+    let temperature = getCityHourForecast(hour).temperatureValue;
+    temperature = scale(temperature, constraints.prototype.minTemperature, constraints.prototype.maxTemperature, 0, 100);
+
+    //all %
+    const humidity = getCityHourForecast(hour).relativeHumidity;
+    const cloud = getCityHourForecast(hour).cloudCover;
+    const rainProb = getCityHourForecast(hour).rainProbability;
 
     // duration of the entire event (maybe 1 min?)
     let totalDuration = 60;      //secs
@@ -36,7 +42,8 @@ function sound() {
     //initial counter
     let skyCounter = 0;
     let rainCounter = 0;
-    let intervalWind = setInterval(playWind, 10000, wind)
+    let windCounter = 0;
+    let intervalWind = setInterval(playWind, windCounter, wind)
     let intervalRain = setInterval(playRain, rainCounter, rain)
     let intervalSky = setInterval(playSky, skyCounter, cloud);
 
@@ -63,7 +70,6 @@ function sound() {
         const panner1 = c.createStereoPanner();
         const panner2 = c.createStereoPanner();
         const panner3 = c.createStereoPanner();
-
 
         //DURATION PARAMETERS
         //duration between 500 and 4000 ms
@@ -147,11 +153,8 @@ function sound() {
         o2.stop(now+dur);
         o3.stop(now+dur);
 
-
-
         if (c.currentTime - startTime > totalDuration)
         {
-            console.log("time: ", c.currentTime - startTime)
             clearInterval(intervalSky)
         }
     }
@@ -168,27 +171,44 @@ function sound() {
         rainCounter = randomNumber(100, 500);
         intervalRain  = setInterval(playRain,  rainCounter, rain)
 
-
         const now = c.currentTime;
         const o1 = c.createOscillator()
         const o2 = c.createOscillator()
         const o3 = c.createOscillator()
         const g = c.createGain();
 
+        //NOISE SECTION
+        const bufferSize = 2 * c.sampleRate,
+            noiseBuffer = c.createBuffer(1, bufferSize, c.sampleRate),
+            output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            output[i] = Math.random() * 2 - 1;
+        }
+        let whiteNoise = c.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+        whiteNoise.loop = true;
+
+        //FILTER SECTION
+        const lpf = c.createBiquadFilter();
+        lpf.frequency.value = 500;
+
+        //WAVE SHAPER
+        const clip = c.createWaveShaper();
+        clip.curve = new Float32Array([-1, 1]);
+
         //const dur = randomNumber(0.1,0.1);
         const dur = randomNumber(50, 200) / 1000;
-        console.log(dur);
         const att = dur/3;
         const dec = dur/3;
 
         o1.frequency.value = randomNumber(300, 500)
         o2.frequency.value = randomNumber(300, 500)
         o3.frequency.value = randomNumber(300, 500)
-        //o.detune;
+
         o1.type = "sine"
         o2.type = "sine"
         o3.type = "sine"
-        //no attack
+
         g.gain.setValueAtTime(0, now);
         g.gain.linearRampToValueAtTime(0.1, now+att);
         g.gain.linearRampToValueAtTime(0.1, now + dur - dec);
@@ -199,6 +219,8 @@ function sound() {
         o3.connect(g);
         g.connect(c.destination)
 
+        whiteNoise.connect(lpf).connect(whiteNoise)
+
         o1.start(now);
         o1.stop(now+dur);
         o2.start(now);
@@ -208,11 +230,8 @@ function sound() {
 
         if (c.currentTime - startTime > totalDuration)
         {
-            console.log("time: ", c.currentTime - startTime)
             clearInterval(intervalRain)
         }
-
-
     }
 
     /**
@@ -220,6 +239,12 @@ function sound() {
      * @param wind forecast wind value
      */
     function playWind (wind) {
+
+        //clear interval and creat new one
+        clearInterval(intervalSky);
+        //time for another call = duration of the actual one
+        windCounter = randomNumber(8000, 12000);
+        intervalWind  = setInterval(playWind,  windCounter, wind)
         //play with a certain probability according the wind quantity
         let delayTime;
         if (randomNumber(0, 100) < wind) {
@@ -297,37 +322,9 @@ function sound() {
         }
         if (c.currentTime - startTime > totalDuration)
         {
-            console.log("time: ", c.currentTime - startTime)
             clearInterval(intervalWind)
         }
     }
-
-    /**
-     * Function to play a note
-     * @param freq frequency of sound
-     * @param dur duration of sound
-     * @param time base time
-     */
-    function playNote (freq, dur, time) {
-        const now = c.currentTime;
-        const o = c.createOscillator()
-        const g = c.createGain();
-
-        o.frequency.value = freq
-        o.type = "sine"
-        o.connect(g);
-        g.connect(c.destination)
-
-        //no attack
-        g.gain.setValueAtTime(0, now+time);
-        g.gain.linearRampToValueAtTime(1, now+time);
-        g.gain.linearRampToValueAtTime(0, now+dur+time);
-
-        o.start(time);
-        o.stop(now+dur+time);
-        //console.log("note ended", now);
-    }
-
 }
 
 //UTILITY
@@ -392,9 +389,6 @@ highpass.Q.value = 2;
 let distortion = context2.createWaveShaper();
 
 let delay = context2.createDelay(90.0);
-
-
-
 
 function StartAudio() {context.resume()};
 context.audioWorklet.addModule('basicnoise.js').then(() => {

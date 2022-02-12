@@ -14,11 +14,13 @@ class constraints
 {
     maxWind = 100;
     flatValue = 0;
-    maxPercentage = 100;
     maxTemperature = 40;
     minTemperature = -10;
     maxRain = 15;
     maxSnow = 5000; //mm of snow
+    maxPercentage = 100;
+    //humidity and cloud are %
+
 }
 
 
