@@ -23,27 +23,16 @@ function sound() {
         clearInterval(intervalSky);
     }
 
-
-    /*
-    Weather parameters:
-    - temperature
-    - precipitation
-    - humidity
-    - wind          //range:
-    - cloud cover
-    ?- air quality
-    ?- Main Condition: clear, cloudy, rainy
-     */
-
     //RETRIEVE off WEATHER PARAMETERS - ALL VALUE SCALED in [0;100]
    const soundWeather = getCityHourForecast(hour);
    console.log("weather param", soundWeather);
 
     let wind = soundWeather.windSpeed;
     wind = scale(wind, 0, constraints.prototype.maxWind, 0, 100);
+    console.log("----wind-----", wind);
 
     let rain = soundWeather.rainValue;
-    rain = scale(rain, 0, constraints.prototype.maxRain, 0, 100);
+    rain = scale(rain, 0, constraints.prototype.maxRain, 0, 0.01);
 
     let snow = soundWeather.snowValue;
     snow = scale(snow, 0, constraints.prototype.maxSnow, 0, 100);
@@ -52,12 +41,13 @@ function sound() {
     temperature = scale(temperature, constraints.prototype.minTemperature, constraints.prototype.maxTemperature, 0, 100);
 
     //all %
-    const humidity =soundWeather.relativeHumidity;
+    let humidity =soundWeather.relativeHumidity;
+    humidity = scale(humidity, 0, 100, 0, 30);
     const cloud = soundWeather.cloudCover;
     const rainProb = soundWeather.rainProbability;
 
     // duration of the entire event (maybe 1 min?)
-    let totalDuration = 10;      //secs
+    let totalDuration = 20;      //secs
     const c = new AudioContext();
     const startTime = c.currentTime;
 
@@ -68,13 +58,15 @@ function sound() {
 
     intervalWind = setInterval(playWind, windCounter, wind)
     intervalRain = setInterval(playRain, rainCounter, rain)
-    intervalSky = setInterval(playSky, skyCounter, cloud);
+    intervalSky = setInterval(playSky, skyCounter, cloud, humidity, temperature);
 
     /**
      * Cloud sound generator
      * @param cloud cloud cover value
+     * @param humidity humidity% value
+     * @param temperature temperature value
      */
-    function playSky (cloud) {
+    function playSky (cloud, humidity, temperature) {
 
         //clear interval and creat new one
         clearInterval(intervalSky);
@@ -91,12 +83,22 @@ function sound() {
         o2.type = "sawtooth";
         o3.type = "sawtooth";
 
+        // VIBRATO SECTION
+        const vib = c.createOscillator();
+        const gainVib = c.createGain();
+        vib.frequency.value = scale(humidity, 0, 100, 0, 15);
+        gainVib.gain.value = scale(humidity, 0, 100, 0, 10);
+
         const g = c.createGain();
 
         //one panner for each osc --> different stereo positions
+        //random panning each note
         const panner1 = c.createStereoPanner();
         const panner2 = c.createStereoPanner();
         const panner3 = c.createStereoPanner();
+        panner1.pan.value = randomNumber(-10,10)/10;
+        panner2.pan.value = randomNumber(-10,10)/10;
+        panner3.pan.value = randomNumber(-10,10)/10;
 
         //DURATION PARAMETERS
         const dur = (skyCounter/1000) * 1.8;
@@ -105,17 +107,13 @@ function sound() {
 
         const maxAmp = 0.01;
 
-        panner1.pan.value = randomNumber(-10,10)/10;
-        panner2.pan.value = randomNumber(-10,10)/10;
-        panner3.pan.value = randomNumber(-10,10)/10;
-
         /*
         choose one chord in the list depending on the cloud covering:
         CONSONANT --> clear
         DISSONANT --> cloud
         more the cloud more the probability of having dissonance
         */
-        const rootNote = 60;
+        const rootNote = Math.floor(scale(temperature, 0, 100, 48, 72));
         let chord;
         const consonantChordList =
             Array
@@ -161,6 +159,10 @@ function sound() {
         g.gain.linearRampToValueAtTime(maxAmp, now + dur - dec);
         g.gain.linearRampToValueAtTime(0, now + dur);
 
+        vib.connect(gainVib).connect(o1.detune);
+        vib.connect(gainVib).connect(o2.detune);
+        vib.connect(gainVib).connect(o3.detune);
+
         //CONNECTION
         o1.connect(g).connect(panner1).connect(c.destination);
         o2.connect(g).connect(panner2).connect(c.destination);
@@ -169,10 +171,12 @@ function sound() {
         o1.start(now);
         o2.start(now);
         o3.start(now);
+        vib.start(now);
 
         o1.stop(now+dur);
         o2.stop(now+dur);
         o3.stop(now+dur);
+        vib.stop(now+dur);
 
         if (c.currentTime - startTime > totalDuration)
         {
@@ -198,7 +202,8 @@ function sound() {
         const o3 = c.createOscillator()
         const g = c.createGain();
 
-        const gNoise = c.createGain();
+        const gNoise1 = c.createGain();
+        const gNoise2 = c.createGain();
 
         //NOISE SECTION
         const bufferSize = 2 * c.sampleRate,
@@ -243,18 +248,22 @@ function sound() {
         o3.connect(g);
         g.connect(c.destination);
 
+        gNoise2.gain.value = rain;
         //TO DO link weather parameter (mm of rain to the soundscape)
         //pink noise multiply white noise
-        whiteNoise.connect(lpf).connect(gNoise.gain);
+        whiteNoise.connect(lpf).connect(gNoise1.gain);
         //result is clipped (waveshaper)
-        whiteNoise.connect(gNoise).connect(clip).connect(c.destination);
+        whiteNoise.connect(gNoise1).connect(clip).connect(gNoise2).connect(c.destination);
 
+        /*
         o1.start(now);
         o1.stop(now+dur);
         o2.start(now);
         o2.stop(now+dur);
         o3.start(now);
         o3.stop(now+dur);
+         */
+        whiteNoise.start(now);
 
         if (c.currentTime - startTime > totalDuration)
         {
@@ -276,9 +285,7 @@ function sound() {
         //play with a certain probability according the wind quantity
         let delayTime;
         if (randomNumber(0, 100) < wind) {
-            //AGGIUNGERE DEC
-            //CAPIRE MEGLIO LFO
-            //CONTROLLARE FREQ LFO
+
             const now = c.currentTime;
 
             //DELAY SECTION
@@ -390,51 +397,3 @@ function noteToFreq(midiNote) {
     let a = 440; //standard frequency of A (common value is 440Hz)
     return (a / 32) * (2 ** ((midiNote - 9) / 12));
 }
-
-
-
-/*
-
-let context= new AudioContext();
-let context2= new AudioContext();
-
-let lowpass = context.createBiquadFilter();
-lowpass.type = 'lowpass';
-//lowpass.Q.value = -7.01;
-lowpass.frequency.setValueAtTime(80, context2.currentTime);
-
-let gain = new GainNode(context);
-gain.gain.value= 0.4;
-
-let gain2 = new GainNode(context2);
-gain2.gain.value= 0.02;
-
-let highpass=context2.createBiquadFilter();
-highpass.type = 'highpass';
-highpass.Q.value = 2;
-//highpass.frequency.setValueAtTime(6000, context2.currentTime);
-
-let distortion = context2.createWaveShaper();
-
-let delay = context2.createDelay(90.0);
-
-function StartAudio() {context.resume()};
-context.audioWorklet.addModule('basicnoise.js').then(() => {
-    let myNoise = new AudioWorkletNode(context,'noise-generator');
-
-    myNoise.connect(lowpass);
-    lowpass.connect(gain);
-    gain.connect(context.destination);
-});
-
-function StartAudio2() {context2.resume()};
-context2.audioWorklet.addModule('basicnoise.js').then(() => {
-    let myNoise2 = new AudioWorkletNode(context2,'noise-generator');
-
-    myNoise2.connect(highpass);
-    highpass.connect(gain2);
-    gain2.connect(delay);
-    delay.connect(context2.destination);
-});
-
- */
