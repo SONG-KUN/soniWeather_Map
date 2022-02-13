@@ -1,6 +1,6 @@
 
 //variables used in retrive informations
-const APIKeys = ['U876fB5Dr4lvY2xZDGAJ3MsHw1QuED48' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
+const APIKeys = ['y0ZYGW7jDdxDTGGCWsbeTObhCWdvyeFE' , '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'];
 
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
@@ -180,11 +180,11 @@ document.addEventListener("DOMContentLoaded", function(event)
  * Get the weather info when click on the map
  * @param evt click event
  */
-const getMapCoordOnClick = (evt) => {
+async function getMapCoordOnClick(evt)
+{
     //tuple of coordinates
     const lonlat = ol.proj.toLonLat(evt.coordinate);
     //prepare clean ambient
-    clearCurrentCityForecast();
     cleanCurrentCity()
 
     currentCity.longitude = lonlat[0];
@@ -192,24 +192,39 @@ const getMapCoordOnClick = (evt) => {
     
     // doing the query to get forecast (or load it in current city)
     // Also only represent the city name on the console, can't print it and call it now; It's the problem of async and cannot get the OBJECT correctly
-    getCityByCoordinates().then(playSound);
+    await getCityByCoordinates();
+    await playSound();
     // weather params to generate sound; 0 is the current hour, stubbed, returns forecast of 1 hour
+}
+
+/**
+ * Function used to retrieve weather from search bar
+ * @returns {Promise<void>} city forecast
+ */
+async function getWeatherOnSearch()
+{
+    currentCity.cityName = search.value;
+    await getCityByName();
 }
 
 /**
  * Function event on click on search button
  */
 weatherButton.addEventListener("click", () => {
-    currentCity.cityName = search.value;
-    getCityByName().then(clearCurrentCityForecast).then(playSound);
+    getWeatherOnSearch().then(playSound);
 });
 
 /**
  * Function to execute the sounds, can become multithread.
  */
-function playSound()
+async function playSound()
 {
-    gettingWeatherDetails().then(sound).then(updateUI).catch((err) => console.log(err));
+    await gettingWeatherDetails();
+    var tmpWeather = await getCityHourForecast(hour);//await gettingWeatherDetails();
+    console.log(tmpWeather);
+    await updateUI();
+    await sound(tmpWeather);
+    //gettingWeatherDetails().then(sound).then(updateUI).catch((err) => console.log(err));
 }
 
 /**
@@ -232,12 +247,9 @@ const updateUI = () => {
   `;
 
     //updating image
-    let imgSrc = null;
-    imgSrc = "/data/WeatherIcons/" + weather.iconNumber + ".png";
+    let imgSrc = "/data/WeatherIcons/" + weather.iconNumber + ".png";
     image.setAttribute("src", imgSrc);
 }
-
-
 
 // function zoomtomilano(){
 //     myview.animate({

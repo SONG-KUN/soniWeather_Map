@@ -265,7 +265,21 @@ function addNewForecast(fullForecast)
  */
 function getCityHourForecast(hour)
 {
+    /*let tmpHourForecast = new weatherForecast();
+    tmpHourForecast.cityCode = 123;
+    tmpHourForecast.windSpeed = 1234;
+    tmpHourForecast.temperatureValue = 1234;
+    tmpHourForecast.iconPhrase = "Prova";
+    tmpHourForecast.rainValue = 1234;
+    tmpHourForecast.snowProbability = 1234;
+    tmpHourForecast.rainProbability = 1234;
+    tmpHourForecast.relativeHumidity = 1234;
+    tmpHourForecast.cloudCover = 1234;
+    tmpHourForecast.iconNumber = 1;
+    tmpHourForecast.snowValue = 1234;
+    return tmpHourForecast;*/
     return currentCityForecast[hour];
+
 }
 
 /**
@@ -329,7 +343,7 @@ async function getCityByCoordinates ()
  */
 async function gettingWeatherDetails()
 {
-    currentCityForecast = []; //clean the array
+    clearCurrentCityForecast(); //clean the array
     const currAPIKey = getAPIKey();
 
     //look if already downloaded

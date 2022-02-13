@@ -2,7 +2,7 @@
  * Sound generator
  */
 
-function sound() {
+function sound(soundWeather) {
 
     /*
     Weather parameters:
@@ -16,9 +16,9 @@ function sound() {
      */
 
     //RETRIEVE off WEATHER PARAMETERS - ALL VALUE SCALED in [0;100]
-    let soundWeather = getCityHourForecast(hour);
-    console.log("GET NEW VALUEEEEE");
-    console.log(soundWeather);
+    /*let soundWeather = getCityHourForecast(hour);
+    console.log("INSIDE");
+    console.log(soundWeather);*/
 
     let wind = soundWeather.windSpeed;
     wind = scale(wind, 0, constraints.prototype.maxWind, 0, 100);
