@@ -71,7 +71,7 @@ function sound() {
         //clear interval and creat new one
         clearInterval(intervalSky);
         //time for another call = duration of the actual one
-        skyCounter = randomNumber(1000, 4000);
+        skyCounter = randomNumber(2000, 5000);
         intervalSky = setInterval(playSky, skyCounter, cloud, humidity, temperature);
         const now = c.currentTime;
 
@@ -86,7 +86,7 @@ function sound() {
         // VIBRATO SECTION
         const vib = c.createOscillator();
         const gainVib = c.createGain();
-        vib.frequency.value = Math.floor(humidity*1.5);
+        vib.frequency.value = Math.floor(humidity*2);
         gainVib.gain.value = humidity;
 
         const g = c.createGain();
@@ -101,7 +101,7 @@ function sound() {
         panner3.pan.value = randomNumber(-10,10)/10;
 
         //DURATION PARAMETERS
-        const dur = (skyCounter/1000) * 1.8;
+        const dur = (skyCounter/1000) * 1.3;
         const att = dur/4;
         const dec = dur/4;
 
@@ -307,13 +307,13 @@ function sound() {
 
             //AMPLITUDE SECTION
             ampGain.gain.setValueAtTime(0, now);
-            ampGain.gain.linearRampToValueAtTime(1, now + att);
-            ampGain.gain.linearRampToValueAtTime(1, now + eventDur - dec);
+            ampGain.gain.linearRampToValueAtTime(0.5, now + att);
+            ampGain.gain.linearRampToValueAtTime(0.5, now + eventDur - dec);
             ampGain.gain.linearRampToValueAtTime(0, now + eventDur);
 
             delayGain.gain.setValueAtTime(0, now+delayTime);
-            delayGain.gain.linearRampToValueAtTime(0.5, now + att + delayTime);
-            delayGain.gain.linearRampToValueAtTime(0.5, now + eventDur + delayTime - dec);
+            delayGain.gain.linearRampToValueAtTime(0.2, now + att + delayTime);
+            delayGain.gain.linearRampToValueAtTime(0.2, now + eventDur + delayTime - dec);
             delayGain.gain.linearRampToValueAtTime(0, now + eventDur + delayTime);
 
             //CONNECTION
