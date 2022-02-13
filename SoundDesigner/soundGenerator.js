@@ -2,7 +2,25 @@
  * Sound generator
  */
 
-function sound(soundWeather) {
+ var intervalWind = intervalRain = intervalSky = -1;
+
+function sound() {
+
+    console.log("sound() invoked");
+
+    if (intervalWind !== -1) {
+        console.log("clearing windInterval...");
+        clearInterval(intervalWind);
+    } 
+    if (intervalRain !== -1) {
+        console.log("clearing rainInterval...");
+        clearInterval(intervalRain);
+    }
+    if (intervalSky !== -1) {
+        console.log("clearing skyInterval...");
+        clearInterval(intervalSky);
+    }
+
 
     /*
     Weather parameters:
@@ -16,9 +34,9 @@ function sound(soundWeather) {
      */
 
     //RETRIEVE off WEATHER PARAMETERS - ALL VALUE SCALED in [0;100]
-    /*let soundWeather = getCityHourForecast(hour);
-    console.log("INSIDE");
-    console.log(soundWeather);*/
+   // const hour = 0;
+   const soundWeather = getCityHourForecast(hour);
+   console.log("weather param", soundWeather);
 
     let wind = soundWeather.windSpeed;
     wind = scale(wind, 0, constraints.prototype.maxWind, 0, 100);
@@ -34,11 +52,12 @@ function sound(soundWeather) {
 
     //all %
     const humidity =soundWeather.relativeHumidity;
+    console.log("--- humidity ---", humidity);
     const cloud = soundWeather.cloudCover;
     const rainProb = soundWeather.rainProbability;
 
     // duration of the entire event (maybe 1 min?)
-    let totalDuration = 60;      //secs
+    let totalDuration = 10;      //secs
     const c = new AudioContext();
     const startTime = c.currentTime;
 
@@ -46,9 +65,13 @@ function sound(soundWeather) {
     let skyCounter = 0;
     let rainCounter = 0;
     let windCounter = 0;
-    let intervalWind = setInterval(playWind, windCounter, wind)
+    /* let intervalWind = setInterval(playWind, windCounter, wind)
     let intervalRain = setInterval(playRain, rainCounter, rain)
-    let intervalSky = setInterval(playSky, skyCounter, cloud);
+    let intervalSky = setInterval(playSky, skyCounter, cloud); */
+
+    intervalWind = setInterval(playWind, windCounter, wind)
+    intervalRain = setInterval(playRain, rainCounter, rain)
+    intervalSky = setInterval(playSky, skyCounter, cloud);
 
     /**
      * Cloud sound generator
@@ -220,7 +243,7 @@ function sound(soundWeather) {
         o1.connect(g);
         o2.connect(g);
         o3.connect(g);
-        g.connect(c.destination)
+        g.connect(c.destination);
 
         //whiteNoise.connect(lpf).connect(whiteNoise)
 

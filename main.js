@@ -1,6 +1,6 @@
 
 //variables used in retrive informations
-const APIKeys = ['y0ZYGW7jDdxDTGGCWsbeTObhCWdvyeFE' , '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'];
+const APIKeys = ['NgAfJtfyYVwfw1VXnhQli90AngIPae7W' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
 
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
@@ -180,51 +180,47 @@ document.addEventListener("DOMContentLoaded", function(event)
  * Get the weather info when click on the map
  * @param evt click event
  */
-async function getMapCoordOnClick(evt)
-{
+const getMapCoordOnClick = (evt) => {
+    console.log("getMapCoordOnClick invoked");
     //tuple of coordinates
     const lonlat = ol.proj.toLonLat(evt.coordinate);
     //prepare clean ambient
-    cleanCurrentCity()
+    cleanCurrentCity();
 
     currentCity.longitude = lonlat[0];
     currentCity.latitude = lonlat[1];
     
     // doing the query to get forecast (or load it in current city)
     // Also only represent the city name on the console, can't print it and call it now; It's the problem of async and cannot get the OBJECT correctly
-    await getCityByCoordinates();
-    await playSound();
-    // weather params to generate sound; 0 is the current hour, stubbed, returns forecast of 1 hour
+    getCityByCoordinates().then(r => playSound());
 }
+
 
 /**
  * Function used to retrieve weather from search bar
  * @returns {Promise<void>} city forecast
  */
-async function getWeatherOnSearch()
+function getWeatherOnSearch()
 {
+    cleanCurrentCity();
     currentCity.cityName = search.value;
-    await getCityByName();
+    getCityByName().then(playSound);
 }
 
 /**
  * Function event on click on search button
  */
 weatherButton.addEventListener("click", () => {
-    getWeatherOnSearch().then(playSound);
+    getWeatherOnSearch().then(r => console.log("Sound"));
 });
 
 /**
- * Function to execute the sounds, can become multithread.
+ * Function used to populate the UI section of city
+ * @param city city used to populate the param
  */
-async function playSound()
+function playSound()
 {
-    await gettingWeatherDetails();
-    var tmpWeather = await getCityHourForecast(hour);//await gettingWeatherDetails();
-    console.log(tmpWeather);
-    await updateUI();
-    await sound(tmpWeather);
-    //gettingWeatherDetails().then(sound).then(updateUI).catch((err) => console.log(err));
+    gettingWeatherDetails().then(r => getCityHourForecast(hour)).then(updateUI).then(sound).catch((err) => console.log(err));
 }
 
 /**
@@ -240,10 +236,12 @@ const updateUI = () => {
     <h3 class="font-c">${weather.iconPhrase}</h3>
     <h4 class="font-c">${"Temperature: " + weather.temperatureValue.toFixed(decimals)} &degC</h4>
     <h4 class="font-c">${"Humidity: " + weather.relativeHumidity.toFixed(decimals)} &percnt;</h4>
-    <h4 class="font-c">${"Wind Speed: " + weather.windSpeed.toFixed(decimals) + " km/h"};</h4>
+    <h4 class="font-c">${"Wind Speed: " + weather.windSpeed.toFixed(decimals) + " km/h"}</h4>
     <h4 class="font-c">${"Cloud Cover: " + weather.cloudCover.toFixed(decimals)} &percnt;</h4>
     <h4 class="font-c">${"Rain Probability: " + weather.rainProbability.toFixed(decimals)} &percnt;</h4>
+    <h4 class="font-c">${"Rain Probability: " + weather.rainValue.toFixed(decimals) + " mm"}</h4>
     <h4 class="font-c">${"Snow Probability: " + weather.snowProbability.toFixed(decimals)} &percnt;</h4>
+    <h4 class="font-c">${"Snow Probability: " + weather.snowValue.toFixed(decimals)/10 + " cm"} </h4>
   `;
 
     //updating image

@@ -25,7 +25,7 @@ class constraints
 
 
 var cities = []; //array of city coordinates and data
-var citiesForecast = []; //array of city coordinates and data
+var citiesForecast = {}; //map of city coordinates and data
 const valueConstraints =
     [
         {
@@ -250,7 +250,8 @@ function addNewForecast(fullForecast)
         }
         currentCityForecast.push(tmpHourForecast);
     })
-    Array.prototype.push.apply(citiesForecast, currentCityForecast);
+    // Array.prototype.push.apply(citiesForecast, currentCityForecast);
+    citiesForecast[currentCityForecast[0].cityCode] = currentCityForecast;
     if (debug === 1)
     {
         console.log("CurrentCityForecast")
@@ -265,21 +266,7 @@ function addNewForecast(fullForecast)
  */
 function getCityHourForecast(hour)
 {
-    /*let tmpHourForecast = new weatherForecast();
-    tmpHourForecast.cityCode = 123;
-    tmpHourForecast.windSpeed = 1234;
-    tmpHourForecast.temperatureValue = 1234;
-    tmpHourForecast.iconPhrase = "Prova";
-    tmpHourForecast.rainValue = 1234;
-    tmpHourForecast.snowProbability = 1234;
-    tmpHourForecast.rainProbability = 1234;
-    tmpHourForecast.relativeHumidity = 1234;
-    tmpHourForecast.cloudCover = 1234;
-    tmpHourForecast.iconNumber = 1;
-    tmpHourForecast.snowValue = 1234;
-    return tmpHourForecast;*/
     return currentCityForecast[hour];
-
 }
 
 /**
@@ -343,15 +330,16 @@ async function getCityByCoordinates ()
  */
 async function gettingWeatherDetails()
 {
-    clearCurrentCityForecast(); //clean the array
+    console.log("gettingWeatherDetails invoked");
+    currentCityForecast = []; //clean the array
     const currAPIKey = getAPIKey();
 
     //look if already downloaded
     //if not working use getCityHourForecast
-    let found = citiesForecast.findIndex(tmpCity => tmpCity.cityCode = currentCity.cityCode);
+    //let found = citiesForecast.findIndex(tmpCity => tmpCity.cityCode = currentCity.cityCode);
 
     //if city is not present
-    if (found === -1)
+    if (!(currentCity.cityCode in citiesForecast))
     {
         const weatherBaseUrl = "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/";
         const query = `${currentCity.cityCode}?apikey=${currAPIKey}`;
@@ -360,6 +348,7 @@ async function gettingWeatherDetails()
         const res = await fetch(weatherBaseUrl + query + details);
         const fullWeather = await res.json();
         if(debug === 1) console.log(fullWeather);
+        console.log("city not found, adding new forecast");
         addNewForecast(fullWeather);
     }
     else
@@ -370,6 +359,7 @@ async function gettingWeatherDetails()
          * time
          * Returns 12 hours forecast
          */
-        currentCityForecast = citiesForecast[found];
+        currentCityForecast = citiesForecast[currentCity.cityCode];
+        console.log("city found, overriding array...", currentCityForecast);
     }
 }
