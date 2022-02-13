@@ -1,5 +1,5 @@
 //variables used in retrive informations
-const APIKeys = ['v3MekwGvJ6Xroz2U35cq6ADgYqFrbK8J' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
+const APIKeys = ['tqkAMEy34tF9jU301rnTIXDe7UBUmQtR' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
 
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
@@ -243,17 +243,17 @@ const updateUI = () => {
     image.setAttribute("src", imgSrc);
 
     // zoom in
-    const lat = currentCity.latitude; // -90 , 90
-    const lon = currentCity.longitude; // -180,180
+    const lat = ol.proj.fromLonLat([currentCity.latitude, currentCity.longitude])[1];// // -90 , 90
+    const lon = ol.proj.fromLonLat([currentCity.latitude, currentCity.longitude])[0];//currentCity.longitude; // -180,180
 
     if (lon < -180 || lon > 180) {
-        Lon = Math.abs(lon + 180, 360) - 180;
+        var Lon = Math.abs(lon + 180, 360) - 180;
     }
     if (lat < -90 || lat > 90) {
-        Lat = Math.abs(lat + 90, 180) - 90;
+        var Lat = Math.abs(lat + 90, 180) - 90;
     }
 
-    zoomIn(Lat,Lon);
+    //zoomIn(Lat,Lon);
 }
 
 /**
