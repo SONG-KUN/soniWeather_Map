@@ -145,11 +145,6 @@ function cleanCurrentCity()
     currentCity.latitude = 0;
 }
 
-function clearCurrentCityForecast()
-{
-    currentCityForecast = [];
-}
-
 /**
  * This function parses the JSON response coming from API into a 12hour data structure
  * @param fullForecast
@@ -264,7 +259,7 @@ function addNewForecast(fullForecast)
  * @param hour is the hour [0-11] of forecast we will read
  * @returns {weatherForecast} all features of an hour weather forecast
  */
-function getCityHourForecast(hour)
+function getCityHourForecast()
 {
     return currentCityForecast[hour];
 }

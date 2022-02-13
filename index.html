@@ -20,10 +20,26 @@
 
             <br><br>
             <h3 class="lead">Search Bar</h3>
-            <label for="searchUser"></label><input type="text" id="searchUser" class="form-control" placeholder="Enter Your Location">
+            <label for="searchUser"></label><input type="text" onfocus="this.value=''" value="" id="searchUser" class="form-control" placeholder="Enter Your Location">
             <button class="btn-submit" id="submit">Submit</button>
-            <br><br><br>
-
+            <br><br>
+            <p> Hour:
+                <select id="chooseHour">
+                    <option value=0>Now</option>
+                    <option value=1>In 1 hour</option>
+                    <option value=2>In 2 hour</option>
+                    <option value=3>In 3 hour</option>
+                    <option value=4>In 4 hour</option>
+                    <option value=5>In 5 hour</option>
+                    <option value=6>In 6 hour</option>
+                    <option value=7>In 7 hour</option>
+                    <option value=8>In 8 hour</option>
+                    <option value=9>In 9 hour</option>
+                    <option value=10>In 10 hour</option>
+                    <option value=11>In 11 hour</option>
+                </select>
+            </p>
+            <br>
             <!-- Image -->
             <div class="image">
                 <img src="" />

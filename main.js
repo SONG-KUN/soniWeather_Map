@@ -1,5 +1,5 @@
 //variables used in retrive informations
-const APIKeys = ['fc0JxtUdMY94hZ9lIu9BEiwD5tn2c9jO' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
+const APIKeys = ['5R7O5rVoGAM3ynEM01J4xPWC9NSIUAn3' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
 
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
@@ -8,10 +8,19 @@ const textContent = document.getElementById("content");
 const search = document.getElementById("searchUser");
 const weatherButton = document.getElementById("submit");
 const image = document.querySelector(".image img");
-var hour = 0; //document.getElementById("hour");
+let selectElement;
+var hour;
 var weather;
 let decimals = 1;
+var output;
 
+
+function getHour()
+{
+    selectElement = document.querySelector('#chooseHour');
+    hour = selectElement.options[selectElement.selectedIndex].value;
+    //console.log("Selection: ",selectElement, "HOUR: ", hour);
+}
 /**
  * Click event listener
  */
@@ -195,14 +204,14 @@ weatherButton.addEventListener("click", () => {
  */
 function playSound()
 {
-    gettingWeatherDetails().then(r => getCityHourForecast(hour)).then(updateUI).then(sound).catch((err) => console.log(err));
+    gettingWeatherDetails().then(r => getHour()).then(updateUI).then(sound).catch((err) => console.log(err));
 }
 
 /**
  * Function used to update all ui functions about city and weather forecast and icon
  */
 const updateUI = () => {
-    weather = getCityHourForecast(hour);
+    weather = getCityHourForecast();
     //console.log(weather);
 
     //updating details into HTML
