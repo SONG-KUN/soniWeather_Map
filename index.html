@@ -20,7 +20,7 @@
             <h3>Layer Switcher</h3>
             <br><br>
             <h3 class="lead">Search Bar</h3>
-            <input type="text" id="searchUser" class="form-control" placeholder="Enter Your Location">
+            <label for="searchUser"></label><input type="text" id="searchUser" class="form-control" placeholder="Enter Your Location">
             <button class="btn-submit" id="submit">Submit</button>
 
             <!-- Image -->
@@ -32,9 +32,15 @@
 
             <br>
 
-            <input type = "radio" name = "baseLayerRadioButton" value = "OSMStandard" checked>OSM standard<br>
-            <input type = "radio" name = "baseLayerRadioButton" value = "OSMHumanitarian">OSM Humanitarian<br>
-            <input type = "radio" name = "baseLayerRadioButton" value = "StamenTerrain">Stamen Terrain<br>
+            <label>
+                <input type = "radio" name = "baseLayerRadioButton" value = "OSMStandard" checked>
+            </label>OSM standard<br>
+            <label>
+                <input type = "radio" name = "baseLayerRadioButton" value = "OSMHumanitarian">
+            </label>OSM Humanitarian<br>
+            <label>
+                <input type = "radio" name = "baseLayerRadioButton" value = "StamenTerrain">
+            </label>Stamen Terrain<br>
         </div>
     </div>
 
