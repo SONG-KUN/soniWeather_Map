@@ -1,6 +1,6 @@
 
 //variables used in retrive informations
-const APIKeys = ['NgAfJtfyYVwfw1VXnhQli90AngIPae7W' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
+const APIKeys = ['ARpuG5U32QuKupqS5W9B5zxL0BA8ey5h' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
 
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
@@ -9,8 +9,7 @@ const textContent = document.getElementById("content");
 const search = document.getElementById("searchUser");
 const weatherButton = document.getElementById("submit");
 const image = document.querySelector(".image img");
-
-var hour = 0;
+var hour = document.getElementById("hour");
 var weather;
 let decimals = 1;
 
@@ -143,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function(event)
         map.addLayer(ItalyGeoJSON);
 
         // Vector feature popup
-        const overlayContainerElement = document.querySelector(".overlay-cotainer");
+        const overlayContainerElement = document.querySelector(".overlay-container");
         const overlayLayer = new ol.Overlay({
             element: overlayContainerElement
         })
@@ -215,8 +214,7 @@ weatherButton.addEventListener("click", () => {
 });
 
 /**
- * Function used to populate the UI section of city
- * @param city city used to populate the param
+ * Common calls between search with
  */
 function playSound()
 {
@@ -232,7 +230,7 @@ const updateUI = () => {
 
     //updating details into HTML
     textContent.innerHTML = `
-    <h3 class="font-c">${currentCity.cityName}</h3>
+    <h2 class="font-c">${currentCity.cityName.toUpperCase()}</h2>
     <h3 class="font-c">${weather.iconPhrase}</h3>
     <h4 class="font-c">${"Temperature: " + weather.temperatureValue.toFixed(decimals)} &degC</h4>
     <h4 class="font-c">${"Humidity: " + weather.relativeHumidity.toFixed(decimals)} &percnt;</h4>
