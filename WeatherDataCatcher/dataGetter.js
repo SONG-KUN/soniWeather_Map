@@ -11,18 +11,6 @@ const mileToKm = 1.60934; //1 mile = 1.60934 Km
 const FToC = 5/9; //conversion for Farenheit to Celsius
 
 //constant variable limits
-class constraints
-{
-    maxWind = 30;
-    flatValue = 0;
-    maxTemperature = 40;
-    minTemperature = -10;
-    maxRain = 15;
-    maxSnow = 5000; //mm of snow
-    //humidity and cloud are %
-    maxPercentage = 100;
-}
-
 
 var cities = []; //array of city coordinates and data
 var citiesForecast = {}; //map of city coordinates and data
@@ -30,28 +18,28 @@ const valueConstraints =
     [
         {
             "valueName" : "Percentage",
-            "maxValue"  : constraints.prototype.maxPercentage,
-            "minValue"  : constraints.prototype.flatValue
+            "maxValue"  : maxPercentage,
+            "minValue"  : flatValue
         },
         {
             "valueName" : "Temperature",
-            "maxValue"  : constraints.prototype.maxTemperature,
-            "minValue"  : constraints.prototype.minTemperature
+            "maxValue"  : maxTemperature,
+            "minValue"  : minTemperature
         },
         {
             "valueName" : "Wind",
-            "maxValue"  : constraints.prototype.maxWind,
-            "minValue"  : constraints.prototype.flatValue
+            "maxValue"  : maxWind,
+            "minValue"  : flatValue
         },
         {
             "valueName" : "Rain",
-            "maxValue"  : constraints.prototype.maxRain,
-            "minValue"  : constraints.prototype.flatValue
+            "maxValue"  : maxRain,
+            "minValue"  : flatValue
         },
         {
             "valueName" : "Snow",
-            "maxValue"  : constraints.prototype.maxSnow,
-            "minValue"  : constraints.prototype.flatValue
+            "maxValue"  : maxSnow,
+            "minValue"  : flatValue
         }
     ];
 
@@ -151,6 +139,7 @@ function cleanCurrentCity()
  */
 function addNewForecast(fullForecast)
 {
+    //console.log("CONSTRAINTS IN DATA GETTER:", maxPercentage,maxRain,maxRain,maxSnow,maxTemperature,minTemperature,flatValue);
     fullForecast.forEach((hourWeather) => {
         let tmpHourForecast = new weatherForecast();
 
@@ -172,11 +161,11 @@ function addNewForecast(fullForecast)
                 tmpHourForecast.temperatureValue = temperatureConverter(hourWeather.Temperature.Value);
             else tmpHourForecast.temperatureValue = Temperature.Value;
             //temperature
-            if (tmpHourForecast.temperatureValue >= constraints.prototype.maxTemperature) {
-                tmpHourForecast.temperatureValue = constraints.prototype.maxTemperature
+            if (tmpHourForecast.temperatureValue >= maxTemperature) {
+                tmpHourForecast.temperatureValue = maxTemperature
             }   //double	Rounded value in specified units. May be NULL.;
-            else if (tmpHourForecast.temperatureValue < constraints.prototype.minTemperature)
-                tmpHourForecast.temperatureValue = constraints.prototype.minTemperature;
+            else if (tmpHourForecast.temperatureValue < minTemperature)
+                tmpHourForecast.temperatureValue = minTemperature;
         }
 
         //humidity
@@ -196,8 +185,8 @@ function addNewForecast(fullForecast)
             else
                 tmpHourForecast.rainValue = hourWeather.Rain.Value;
 
-            if (tmpHourForecast.rainValue > constraints.prototype.maxRain)
-                tmpHourForecast.rainValue = constraints.prototype.maxRain;
+            if (tmpHourForecast.rainValue > maxRain)
+                tmpHourForecast.rainValue = maxRain;
         }
 
         //snow probability
@@ -215,8 +204,8 @@ function addNewForecast(fullForecast)
             else
                 tmpHourForecast.snowValue = hourWeather.Snow.Value;
 
-            if (tmpHourForecast.snowValue > constraints.prototype.maxSnow)
-                tmpHourForecast.snowValue = constraints.prototype.maxSnow;
+            if (tmpHourForecast.snowValue > maxSnow)
+                tmpHourForecast.snowValue = maxSnow;
         }
 
         //cloud cover
@@ -235,8 +224,8 @@ function addNewForecast(fullForecast)
             else
                 tmpHourForecast.windSpeed = fullForecast.Wind.Speed.Value;
 
-            if (tmpHourForecast.windSpeed > constraints.prototype.maxWind)
-                tmpHourForecast.windSpeed = constraints.prototype.maxWind;
+            if (tmpHourForecast.windSpeed > maxWind)
+                tmpHourForecast.windSpeed = maxWind;
         }
         if (debug === 1)
         {

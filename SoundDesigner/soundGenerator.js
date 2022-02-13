@@ -7,13 +7,14 @@ var intervalSky = -1;
 var intervalRain = -1;
 
 function sound() {
+    //console.log("CONSTRAINTS IN SOUND:", maxPercentage, maxRain, maxRain, maxSnow, maxTemperature, minTemperature, flatValue);
 
     console.log("sound() invoked");
 
     if (intervalWind !== -1) {
         console.log("clearing windInterval...");
         clearInterval(intervalWind);
-    } 
+    }
     if (intervalRain !== -1) {
         console.log("clearing rainInterval...");
         clearInterval(intervalRain);
@@ -24,21 +25,21 @@ function sound() {
     }
 
     //RETRIEVE off WEATHER PARAMETERS - ALL VALUE SCALED in [0;100]
-   const soundWeather = getCityHourForecast(hour);
+    const soundWeather = getCityHourForecast(hour);
+    console.log("weather param", soundWeather);
 
     let wind = soundWeather.windSpeed;
-    //wind = scale(wind, 0, constraints.prototype.maxWind, 0, 100);
-    wind = scale(wind, 0, 30, 0, 100);
+    wind = scale(wind, 0, maxWind, 0, 100);
+    console.log("----wind-----", wind);
 
     let rain = soundWeather.rainValue;
-    rain = scale(rain, 0, constraints.prototype.maxRain, 0, 0.01);
+    rain = scale(rain, 0, maxRain, 0, 0.01);
 
     let snow = soundWeather.snowValue;
-    snow = scale(snow, 0, constraints.prototype.maxSnow, 0, 100);
+    snow = scale(snow, 0, maxSnow, 0, 100);
 
     let temperature = soundWeather.temperatureValue;
-    temperature = scale(temperature, -12, 40, 42, 84);
-
+    temperature = scale(temperature, minTemperature, maxTemperature, 0, 100);
 
     let humidity = soundWeather.relativeHumidity;
     humidity = scale(humidity, 0, 100, 0, 10);
@@ -57,7 +58,7 @@ function sound() {
     let windCounter = 0;
 
     intervalWind = setInterval(playWind, windCounter, wind)
-   // intervalRain = setInterval(playRain, rainCounter, rain)
+    // intervalRain = setInterval(playRain, rainCounter, rain)
     intervalSky = setInterval(playSky, skyCounter, cloud, humidity, temperature);
 
     /**
@@ -66,7 +67,7 @@ function sound() {
      * @param humidity humidity% value
      * @param temperature temperature value
      */
-    function playSky (cloud, humidity, temperature) {
+    function playSky(cloud, humidity, temperature) {
 
         //clear interval and creat new one
         clearInterval(intervalSky);
@@ -86,7 +87,7 @@ function sound() {
         // VIBRATO SECTION
         const vib = c.createOscillator();
         const gainVib = c.createGain();
-        vib.frequency.value = Math.floor(humidity*1.5);
+        vib.frequency.value = Math.floor(humidity * 1.5);
         gainVib.gain.value = humidity;
 
         const g = c.createGain();
@@ -96,14 +97,14 @@ function sound() {
         const panner1 = c.createStereoPanner();
         const panner2 = c.createStereoPanner();
         const panner3 = c.createStereoPanner();
-        panner1.pan.value = randomNumber(-10,10)/10;
-        panner2.pan.value = randomNumber(-10,10)/10;
-        panner3.pan.value = randomNumber(-10,10)/10;
+        panner1.pan.value = randomNumber(-10, 10) / 10;
+        panner2.pan.value = randomNumber(-10, 10) / 10;
+        panner3.pan.value = randomNumber(-10, 10) / 10;
 
         //DURATION PARAMETERS
-        const dur = (skyCounter/1000) * 1.8;
-        const att = dur/4;
-        const dec = dur/4;
+        const dur = (skyCounter / 1000) * 1.8;
+        const att = dur / 4;
+        const dec = dur / 4;
 
         const maxAmp = 0.01;
 
@@ -113,8 +114,8 @@ function sound() {
         DISSONANT --> cloud
         more the cloud more the probability of having dissonance
         */
-       const rootNote = temperature;
-       console.log(rootNote);
+        const rootNote = temperature;
+        console.log(rootNote);
 
         let chord;
         const consonantChordList =
@@ -140,13 +141,10 @@ function sound() {
                 [0, 1, 11]
             );
 
-        if (cloud < randomNumber(0,100))
-        {
+        if (cloud < randomNumber(0, 100)) {
             //more CLEAR
             chord = consonantChordList[Math.floor(Math.random() * consonantChordList.length)];
-        }
-        else
-        {
+        } else {
             //more CLOUDY
             chord = dissonantChordList[Math.floor(Math.random() * dissonantChordList.length)];
         }
@@ -155,11 +153,11 @@ function sound() {
         o2.frequency.value = noteToFreq(chord[1] + rootNote);
         o3.frequency.value = noteToFreq(chord[2] + rootNote);
 
-        console.log(o3.frequency.value, o2.frequency.value,  o1.frequency.value);
+        console.log(o3.frequency.value, o2.frequency.value, o1.frequency.value);
 
         //setting envelope
         g.gain.setValueAtTime(0, now);
-        g.gain.linearRampToValueAtTime(maxAmp, now+att);
+        g.gain.linearRampToValueAtTime(maxAmp, now + att);
         g.gain.linearRampToValueAtTime(maxAmp, now + dur - dec);
         g.gain.linearRampToValueAtTime(0, now + dur);
 
@@ -177,13 +175,12 @@ function sound() {
         o3.start(now);
         vib.start(now);
 
-        o1.stop(now+dur);
-        o2.stop(now+dur);
-        o3.stop(now+dur);
-        vib.stop(now+dur);
+        o1.stop(now + dur);
+        o2.stop(now + dur);
+        o3.stop(now + dur);
+        vib.stop(now + dur);
 
-        if (c.currentTime - startTime > totalDuration)
-        {
+        if (c.currentTime - startTime > totalDuration) {
             clearInterval(intervalSky)
         }
     }
@@ -192,13 +189,13 @@ function sound() {
      * Rain sound generator
      * @param rain forecast of rain
      */
-    function playRain (rain, rainProb) {
+    function playRain(rain, rainProb) {
 
         //clear interval and creat new one
         clearInterval(intervalRain);
         //time for another call = duration of the actual one
         rainCounter = randomNumber(100, 500);
-        intervalRain  = setInterval(playRain,  rainCounter, rain)
+        intervalRain = setInterval(playRain, rainCounter, rain)
 
         const now = c.currentTime;
         const o1 = c.createOscillator()
@@ -208,8 +205,8 @@ function sound() {
 
         //const dur = randomNumber(0.1,0.1);
         const dur = randomNumber(50, 200) / 1000;
-        const att = dur/3;
-        const dec = dur/3;
+        const att = dur / 3;
+        const dec = dur / 3;
 
         o1.frequency.value = randomNumber(300, 500)
         o2.frequency.value = randomNumber(300, 500)
@@ -220,7 +217,7 @@ function sound() {
         o3.type = "sine"
 
         g.gain.setValueAtTime(0, now);
-        g.gain.linearRampToValueAtTime(0.1, now+att);
+        g.gain.linearRampToValueAtTime(0.1, now + att);
         g.gain.linearRampToValueAtTime(0.1, now + dur - dec);
         g.gain.linearRampToValueAtTime(0, now + dur);
 
@@ -231,14 +228,13 @@ function sound() {
         g.connect(c.destination);
 
         o1.start(now);
-        o1.stop(now+dur);
+        o1.stop(now + dur);
         o2.start(now);
-        o2.stop(now+dur);
+        o2.stop(now + dur);
         o3.start(now);
-        o3.stop(now+dur);
+        o3.stop(now + dur);
 
-        if (c.currentTime - startTime > totalDuration)
-        {
+        if (c.currentTime - startTime > totalDuration) {
             clearInterval(intervalRain)
         }
     }
@@ -247,13 +243,13 @@ function sound() {
      * Function generator for wind sound
      * @param wind forecast wind value
      */
-    function playWind (wind) {
+    function playWind(wind) {
 
         //clear interval and creat new one
         clearInterval(intervalWind);
         //time for another call = duration of the actual one
         windCounter = randomNumber(8000, 12000);
-        intervalWind  = setInterval(playWind,  windCounter, wind)
+        intervalWind = setInterval(playWind, windCounter, wind)
         //play with a certain probability according the wind quantity
         let delayTime;
         if (randomNumber(0, 100) < wind) {
@@ -311,7 +307,7 @@ function sound() {
             ampGain.gain.linearRampToValueAtTime(1, now + eventDur - dec);
             ampGain.gain.linearRampToValueAtTime(0, now + eventDur);
 
-            delayGain.gain.setValueAtTime(0, now+delayTime);
+            delayGain.gain.setValueAtTime(0, now + delayTime);
             delayGain.gain.linearRampToValueAtTime(0.5, now + att + delayTime);
             delayGain.gain.linearRampToValueAtTime(0.5, now + eventDur + delayTime - dec);
             delayGain.gain.linearRampToValueAtTime(0, now + eventDur + delayTime);
@@ -327,8 +323,7 @@ function sound() {
             whiteNoise.stop(now + eventDur + delay.delayTime.value);
             lfo.stop(now + eventDur + delay.delayTime.value);
         }
-        if (c.currentTime - startTime > totalDuration)
-        {
+        if (c.currentTime - startTime > totalDuration) {
             clearInterval(intervalWind)
         }
     }
@@ -344,7 +339,7 @@ function sound() {
  * @param outMax final max value
  * @returns {*} the scale value
  */
-function scale (number, inMin, inMax, outMin, outMax) {
+function scale(number, inMin, inMax, outMin, outMax) {
     return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
 

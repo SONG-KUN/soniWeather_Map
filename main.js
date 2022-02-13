@@ -1,5 +1,5 @@
 //variables used in retrive informations
-const APIKeys = ['ekMt1n3LcGabxtcGNcjWs9foddqrfPLG' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
+const APIKeys = ['v3MekwGvJ6Xroz2U35cq6ADgYqFrbK8J' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
 
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
@@ -13,6 +13,14 @@ var hour;
 var weather;
 let decimals = 1;
 var output;
+
+var maxWind = 30;
+var flatValue = 0;
+var maxTemperature = 40;
+var minTemperature = -10;
+var maxRain = 15;
+var maxSnow = 5000; //mm of snow
+var maxPercentage = 100;
 
 
 function getHour()
@@ -225,7 +233,7 @@ const updateUI = () => {
     <h4 class="font-c">${"Rain Probability: " + weather.rainProbability.toFixed(decimals)} &percnt;</h4>
     <h4 class="font-c">${"Rain: " + weather.rainValue.toFixed(decimals) + " mm"}</h4>
     <h4 class="font-c">${"Snow Probability: " + weather.snowProbability.toFixed(decimals)} &percnt;</h4>
-    <h4 class="font-c">${"Snow: " + weather.snowValue.toFixed(decimals)/10 + " cm"} </h4>
+    <h4 class="font-c">${"Snow: " + weather.snowValue.toFixed(decimals) + " mm"} </h4>
   `;
 
     //updating image
