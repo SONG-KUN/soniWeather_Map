@@ -2,7 +2,9 @@
  * Sound generator
  */
 
- var intervalWind = intervalRain = intervalSky = -1;
+var intervalWind = -1;
+var intervalSky = -1;
+var intervalRain = -1;
 
 function sound() {
 
@@ -34,7 +36,6 @@ function sound() {
      */
 
     //RETRIEVE off WEATHER PARAMETERS - ALL VALUE SCALED in [0;100]
-   // const hour = 0;
    const soundWeather = getCityHourForecast(hour);
    console.log("weather param", soundWeather);
 
@@ -52,7 +53,6 @@ function sound() {
 
     //all %
     const humidity =soundWeather.relativeHumidity;
-    console.log("--- humidity ---", humidity);
     const cloud = soundWeather.cloudCover;
     const rainProb = soundWeather.rainProbability;
 
@@ -65,9 +65,6 @@ function sound() {
     let skyCounter = 0;
     let rainCounter = 0;
     let windCounter = 0;
-    /* let intervalWind = setInterval(playWind, windCounter, wind)
-    let intervalRain = setInterval(playRain, rainCounter, rain)
-    let intervalSky = setInterval(playSky, skyCounter, cloud); */
 
     intervalWind = setInterval(playWind, windCounter, wind)
     intervalRain = setInterval(playRain, rainCounter, rain)
@@ -90,16 +87,18 @@ function sound() {
         const o1 = c.createOscillator();
         const o2 = c.createOscillator();
         const o3 = c.createOscillator();
+        o1.type = "sawtooth";
+        o2.type = "sawtooth";
+        o3.type = "sawtooth";
 
         const g = c.createGain();
 
+        //one panner for each osc --> different stereo positions
         const panner1 = c.createStereoPanner();
         const panner2 = c.createStereoPanner();
         const panner3 = c.createStereoPanner();
 
         //DURATION PARAMETERS
-        //duration between 500 and 4000 ms
-        //const dur = randomNumber(2000, 4000)/1000;
         const dur = (skyCounter/1000) * 1.8;
         const att = dur/4;
         const dec = dur/4;
@@ -152,10 +151,6 @@ function sound() {
             chord = dissonantChordList[Math.floor(Math.random() * dissonantChordList.length)];
         }
 
-        o1.type = "sawtooth";
-        o2.type = "sawtooth";
-        o3.type = "sawtooth";
-
         o1.frequency.value = noteToFreq(chord[0] + rootNote);
         o2.frequency.value = noteToFreq(chord[1] + rootNote);
         o3.frequency.value = noteToFreq(chord[2] + rootNote);
@@ -203,6 +198,8 @@ function sound() {
         const o3 = c.createOscillator()
         const g = c.createGain();
 
+        const gNoise = c.createGain();
+
         //NOISE SECTION
         const bufferSize = 2 * c.sampleRate,
             noiseBuffer = c.createBuffer(1, bufferSize, c.sampleRate),
@@ -240,12 +237,17 @@ function sound() {
         g.gain.linearRampToValueAtTime(0.1, now + dur - dec);
         g.gain.linearRampToValueAtTime(0, now + dur);
 
+        //sum of oscillator
         o1.connect(g);
         o2.connect(g);
         o3.connect(g);
         g.connect(c.destination);
 
-        //whiteNoise.connect(lpf).connect(whiteNoise)
+        //TO DO link weather parameter (mm of rain to the soundscape)
+        //pink noise multiply white noise
+        whiteNoise.connect(lpf).connect(gNoise.gain);
+        //result is clipped (waveshaper)
+        whiteNoise.connect(gNoise).connect(clip).connect(c.destination);
 
         o1.start(now);
         o1.stop(now+dur);
