@@ -269,7 +269,7 @@ function sound() {
     function playWind (wind) {
 
         //clear interval and creat new one
-        clearInterval(intervalSky);
+        clearInterval(intervalWind);
         //time for another call = duration of the actual one
         windCounter = randomNumber(8000, 12000);
         intervalWind  = setInterval(playWind,  windCounter, wind)
