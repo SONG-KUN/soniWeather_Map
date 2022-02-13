@@ -31,13 +31,13 @@ function sound() {
     wind = scale(wind, 0, maxWind, 0, 100);
 
     let rain = soundWeather.rainValue;
-    rain = scale(rain, 0, maxRain, 0, 0.01);
+    rain = scale(rain, 0, maxRain, 0, 0.9);
 
     let snow = soundWeather.snowValue;
     snow = scale(snow, 0, maxSnow, 0, 100);
 
     let temperature = soundWeather.temperatureValue;
-    temperature = scale(temperature, minTemperature, maxTemperature, 0, 100);
+    temperature = scale(temperature, minTemperature, maxTemperature, 48, 84);
 
     let humidity = soundWeather.relativeHumidity;
     humidity = scale(humidity, 0, 100, 0, 10);
@@ -46,7 +46,7 @@ function sound() {
     const rainProb = soundWeather.rainProbability;
 
     // duration of the entire event (maybe 1 min?)
-    let totalDuration = 20;      //secs
+    let totalDuration = 30;      //secs
     const c = new AudioContext();
     const startTime = c.currentTime;
 
@@ -56,7 +56,7 @@ function sound() {
     let windCounter = 0;
 
     intervalWind = setInterval(playWind, windCounter, wind)
-   // intervalRain = setInterval(playRain, rainCounter, rain)
+    intervalRain = setInterval(playRain, rainCounter, rain, rainProb)
     intervalSky = setInterval(playSky, skyCounter, cloud, humidity, temperature);
 
     /**
@@ -112,8 +112,8 @@ function sound() {
         DISSONANT --> cloud
         more the cloud more the probability of having dissonance
         */
-       const rootNote = temperature;
-       console.log(rootNote);
+        const rootNote = temperature;
+        console.log(rootNote);
 
         let chord;
         const consonantChordList =
@@ -196,50 +196,68 @@ function sound() {
         //clear interval and creat new one
         clearInterval(intervalRain);
         //time for another call = duration of the actual one
-        rainCounter = randomNumber(100, 500);
-        intervalRain  = setInterval(playRain,  rainCounter, rain)
+        rainCounter = randomNumber(100, 1000);
+        intervalRain  = setInterval(playRain,  rainCounter, rain, rainProb)
+        if (randomNumber(0, 100) < rainProb) {
 
-        const now = c.currentTime;
-        const o1 = c.createOscillator()
-        const o2 = c.createOscillator()
-        const o3 = c.createOscillator()
-        const g = c.createGain();
+            //DELAY SECTION
+            const delay = c.createDelay(5.0);
+            delay.delayTime.value = randomNumber(0, 100) / 100;
 
-        //const dur = randomNumber(0.1,0.1);
-        const dur = randomNumber(50, 200) / 1000;
-        const att = dur/3;
-        const dec = dur/3;
+            const now = c.currentTime;
+            const o1 = c.createOscillator()
+            const o2 = c.createOscillator()
+            const o3 = c.createOscillator()
+            const g = c.createGain();
 
-        o1.frequency.value = randomNumber(300, 500)
-        o2.frequency.value = randomNumber(300, 500)
-        o3.frequency.value = randomNumber(300, 500)
+            const gFeedback = c.createGain();
+            gFeedback.gain.value = rain;
 
-        o1.type = "sine"
-        o2.type = "sine"
-        o3.type = "sine"
+            //const dur = randomNumber(0.1,0.1);
+            const dur = randomNumber(100, 300) / 1000;
 
-        g.gain.setValueAtTime(0, now);
-        g.gain.linearRampToValueAtTime(0.1, now+att);
-        g.gain.linearRampToValueAtTime(0.1, now + dur - dec);
-        g.gain.linearRampToValueAtTime(0, now + dur);
+            o1.frequency.value = randomNumber(2000, 3000);
+            o2.frequency.value = randomNumber(2000, 3000);
+            o3.frequency.value = randomNumber(2000, 3000);
 
-        //sum of oscillator
-        o1.connect(g);
-        o2.connect(g);
-        o3.connect(g);
-        g.connect(c.destination);
+            //one panner for each osc --> different stereo positions
+            //random panning each note
+            const panner1 = c.createStereoPanner();
+            const panner2 = c.createStereoPanner();
+            const panner3 = c.createStereoPanner();
+            panner1.pan.value = randomNumber(-10,10)/10;
+            panner2.pan.value = randomNumber(-10,10)/10;
+            panner3.pan.value = randomNumber(-10,10)/10;
 
-        o1.start(now);
-        o1.stop(now+dur);
-        o2.start(now);
-        o2.stop(now+dur);
-        o3.start(now);
-        o3.stop(now+dur);
 
-        if (c.currentTime - startTime > totalDuration)
-        {
+            o1.type = "square"
+            o2.type = "sawtooth"
+            o3.type = "triangle"
+
+            g.gain.setValueAtTime(0.02, now);
+            g.gain.linearRampToValueAtTime(0, now + dur);
+
+            //sum of oscillator
+            o1.connect(panner1).connect(g);
+            o2.connect(panner2).connect(g);
+            o3.connect(panner3).connect(g);
+            g.connect(c.destination);
+
+            g.connect(delay).connect(c.destination);
+            delay.connect(gFeedback).connect(delay);
+
+            o1.start(now);
+            o1.stop(now + dur+10);
+            o2.start(now);
+            o2.stop(now + dur+10);
+            o3.start(now);
+            o3.stop(now + dur+10);
+        }
+
+        if (c.currentTime - startTime > totalDuration) {
             clearInterval(intervalRain)
         }
+
     }
 
     /**
@@ -254,20 +272,18 @@ function sound() {
         windCounter = randomNumber(8000, 12000);
         intervalWind = setInterval(playWind, windCounter, wind)
         //play with a certain probability according the wind quantity
-        let delayTime;
         if (randomNumber(0, 100) < wind) {
 
             const now = c.currentTime;
 
             //DELAY SECTION
             const delay = c.createDelay(5.0);
-            const delayTime = randomNumber(10, 30) / 10;
-            delay.delayTime.value = delayTime;
+            delay.delayTime.value = randomNumber(10, 30) / 10;
 
             //wind event has a random duration
-            const eventDur = randomNumber(10, 100) / 10;
+            const eventDur = randomNumber(10, 50) / 10;
             const att = eventDur / 10;
-            const dec = eventDur / 5;
+            const dec = eventDur / 3;
 
             const ampGain = c.createGain();
             const delayGain = c.createGain()
@@ -275,7 +291,7 @@ function sound() {
             //LFO SECTION
             const lfo = c.createOscillator();
             lfo.type = "triangle";
-            lfo.frequency.value = randomNumber(1, 10);
+            lfo.frequency.value = randomNumber(1, 7);
 
             //FILTER SECTION
             const bpf = c.createBiquadFilter();
@@ -310,14 +326,13 @@ function sound() {
             ampGain.gain.linearRampToValueAtTime(0.5, now + eventDur - dec);
             ampGain.gain.linearRampToValueAtTime(0, now + eventDur);
 
-            delayGain.gain.setValueAtTime(0, now+delayTime);
-            delayGain.gain.linearRampToValueAtTime(0.2, now + att + delayTime);
-            delayGain.gain.linearRampToValueAtTime(0.2, now + eventDur + delayTime - dec);
-            delayGain.gain.linearRampToValueAtTime(0, now + eventDur + delayTime);
+            delayGain.gain.setValueAtTime(0, now+delay.delayTime.value);
+            delayGain.gain.linearRampToValueAtTime(0.2, now + att + delay.delayTime.value);
+            delayGain.gain.linearRampToValueAtTime(0.2, now + eventDur + delay.delayTime.value - dec);
+            delayGain.gain.linearRampToValueAtTime(0, now + eventDur + delay.delayTime.value);
 
             //CONNECTION
             lfo.connect(ampGain.gain);
-            //modGain.connect(ampGain);
             whiteNoise.connect(bpf).connect(panner).connect(ampGain).connect(c.destination);
             ampGain.connect(delay).connect(delayGain).connect(c.destination);
 

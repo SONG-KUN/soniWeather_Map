@@ -1,5 +1,5 @@
 //variables used in retrive informations
-const APIKeys = ['v3MekwGvJ6Xroz2U35cq6ADgYqFrbK8J' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
+const APIKeys = ['K0xAlDFPRz5xgVA6Srk7EYD5HfWKKlyt' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
 
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
@@ -14,10 +14,10 @@ var weather;
 let decimals = 1;
 var output;
 
-var maxWind = 30;
+var maxWind = 40;
 var flatValue = 0;
 var maxTemperature = 40;
-var minTemperature = -10;
+var minTemperature = -20;
 var maxRain = 15;
 var maxSnow = 5000; //mm of snow
 var maxPercentage = 100;
@@ -253,7 +253,8 @@ const updateUI = () => {
         Lat = Math.abs(lat + 90, 180) - 90;
     }
 
-    zoomIn(Lat,Lon);
+    //zoomIn(Lat,Lon);
+    zoomIn(lat, lon);
 }
 
 /**
