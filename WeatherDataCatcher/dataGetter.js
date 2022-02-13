@@ -13,7 +13,7 @@ const FToC = 5/9; //conversion for Farenheit to Celsius
 //constant variable limits
 class constraints
 {
-    maxWind = 100;
+    maxWind = 50;
     flatValue = 0;
     maxTemperature = 40;
     minTemperature = -10;
