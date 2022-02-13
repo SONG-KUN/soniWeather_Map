@@ -245,6 +245,32 @@ const updateUI = () => {
     //updating image
     let imgSrc = "/data/WeatherIcons/" + weather.iconNumber + ".png";
     image.setAttribute("src", imgSrc);
+    
+    // zoom in
+    const lat = ol.proj.fromLonLat([currentCity.latitude, currentCity.longitude])[1] // -90 , 90
+    const lon = ol.proj.fromLonLat([currentCity.latitude, currentCity.longitude])[0] // -180,180
+    // console.log([lat,lon])
+
+    if (lon < -180 || lon > 180) {
+        Lon = Math.abs(lon + 180, 360) - 180;
+    }
+    if (lat < -90 || lat > 90) {
+        Lat = Math.abs(lat + 90, 360) - 90;
+    }
+
+    zoomIn(Lat,Lon);
+}
+
+/**
+ * 
+ */
+function zoomIn(Lat , Lon)
+{
+    myview.animate({
+        center: [Lat , Lon],
+        duration: 1800,
+        zoom: 6
+    })
 }
 
 // function zoomtomilano(){
