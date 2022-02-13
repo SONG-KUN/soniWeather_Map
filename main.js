@@ -225,7 +225,9 @@ const updateUI = () => {
     //updating details into HTML
     textContent.innerHTML = `
     <h2 class="font-c">${currentCity.cityName.toUpperCase()}</h2>
-    <h3 class="font-c">${weather.iconPhrase}</h3>
+    <h4 class="font-c">${"Lat: " + currentCity.latitude.toFixed(6)} </h4>
+    <h4 class="font-c">${"Lon: " + currentCity.longitude.toFixed(6)} </h4>
+    <h3 class="font-c">${weather.iconPhrase}</h3>    
     <h4 class="font-c">${"Temperature: " + weather.temperatureValue.toFixed(decimals)} &degC</h4>
     <h4 class="font-c">${"Humidity: " + weather.relativeHumidity.toFixed(decimals)} &percnt;</h4>
     <h4 class="font-c">${"Wind Speed: " + weather.windSpeed.toFixed(decimals) + " km/h"}</h4>
@@ -241,14 +243,14 @@ const updateUI = () => {
     image.setAttribute("src", imgSrc);
 
     // zoom in
-    const lat = ol.proj.fromLonLat([currentCity.latitude, currentCity.longitude])[1] // -90 , 90
-    const lon = ol.proj.fromLonLat([currentCity.latitude, currentCity.longitude])[0] // -180,180
+    const lat = currentCity.latitude; // -90 , 90
+    const lon = currentCity.longitude; // -180,180
 
     if (lon < -180 || lon > 180) {
         Lon = Math.abs(lon + 180, 360) - 180;
     }
     if (lat < -90 || lat > 90) {
-        Lat = Math.abs(lat + 90, 360) - 90;
+        Lat = Math.abs(lat + 90, 180) - 90;
     }
 
     zoomIn(Lat,Lon);
