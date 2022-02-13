@@ -1,5 +1,5 @@
 //variables used in retrive informations
-const APIKeys = ['5R7O5rVoGAM3ynEM01J4xPWC9NSIUAn3' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
+const APIKeys = ['ekMt1n3LcGabxtcGNcjWs9foddqrfPLG' /*, '7pu6ELCYDhg8YqBTAPNCal6I6svfsuEL'*/];
 
 // URL of the TILE SERVER
 const url_carto_cdn = 'http://{1-4}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';

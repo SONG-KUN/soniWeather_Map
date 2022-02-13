@@ -25,11 +25,10 @@ function sound() {
 
     //RETRIEVE off WEATHER PARAMETERS - ALL VALUE SCALED in [0;100]
    const soundWeather = getCityHourForecast(hour);
-   console.log("weather param", soundWeather);
 
     let wind = soundWeather.windSpeed;
-    wind = scale(wind, 0, constraints.prototype.maxWind, 0, 100);
-    console.log("----wind-----", wind);
+    //wind = scale(wind, 0, constraints.prototype.maxWind, 0, 100);
+    wind = scale(wind, 0, 30, 0, 100);
 
     let rain = soundWeather.rainValue;
     rain = scale(rain, 0, constraints.prototype.maxRain, 0, 0.01);
@@ -38,10 +37,12 @@ function sound() {
     snow = scale(snow, 0, constraints.prototype.maxSnow, 0, 100);
 
     let temperature = soundWeather.temperatureValue;
-    temperature = scale(temperature, constraints.prototype.minTemperature, constraints.prototype.maxTemperature, 0, 100);
+    temperature = scale(temperature, -12, 40, 42, 84);
 
-    //all %
-    const humidity =soundWeather.relativeHumidity;
+
+    let humidity = soundWeather.relativeHumidity;
+    humidity = scale(humidity, 0, 100, 0, 10);
+
     const cloud = soundWeather.cloudCover;
     const rainProb = soundWeather.rainProbability;
 
@@ -56,7 +57,7 @@ function sound() {
     let windCounter = 0;
 
     intervalWind = setInterval(playWind, windCounter, wind)
-    intervalRain = setInterval(playRain, rainCounter, rain)
+   // intervalRain = setInterval(playRain, rainCounter, rain)
     intervalSky = setInterval(playSky, skyCounter, cloud, humidity, temperature);
 
     /**
@@ -71,22 +72,22 @@ function sound() {
         clearInterval(intervalSky);
         //time for another call = duration of the actual one
         skyCounter = randomNumber(1000, 4000);
-        intervalSky  = setInterval(playSky,  skyCounter, cloud)
+        intervalSky = setInterval(playSky, skyCounter, cloud, humidity, temperature);
         const now = c.currentTime;
 
         //3 oscillator --> triad chord
         const o1 = c.createOscillator();
         const o2 = c.createOscillator();
         const o3 = c.createOscillator();
-        o1.type = "sawtooth";
-        o2.type = "sawtooth";
-        o3.type = "sawtooth";
+        o1.type = "triangle";
+        o2.type = "triangle";
+        o3.type = "triangle";
 
         // VIBRATO SECTION
         const vib = c.createOscillator();
         const gainVib = c.createGain();
-        vib.frequency.value = scale(humidity, 0, 100, 0, 15);
-        gainVib.gain.value = scale(humidity, 0, 100, 0, 10);
+        vib.frequency.value = Math.floor(humidity*1.5);
+        gainVib.gain.value = humidity;
 
         const g = c.createGain();
 
@@ -112,7 +113,9 @@ function sound() {
         DISSONANT --> cloud
         more the cloud more the probability of having dissonance
         */
-        const rootNote = Math.floor(scale(temperature, 0, 100, 48, 72));
+       const rootNote = temperature;
+       console.log(rootNote);
+
         let chord;
         const consonantChordList =
             Array
@@ -152,15 +155,17 @@ function sound() {
         o2.frequency.value = noteToFreq(chord[1] + rootNote);
         o3.frequency.value = noteToFreq(chord[2] + rootNote);
 
+        console.log(o3.frequency.value, o2.frequency.value,  o1.frequency.value);
+
         //setting envelope
         g.gain.setValueAtTime(0, now);
         g.gain.linearRampToValueAtTime(maxAmp, now+att);
         g.gain.linearRampToValueAtTime(maxAmp, now + dur - dec);
         g.gain.linearRampToValueAtTime(0, now + dur);
 
-        vib.connect(gainVib).connect(o1.detune);
-        vib.connect(gainVib).connect(o2.detune);
-        vib.connect(gainVib).connect(o3.detune);
+        vib.connect(gainVib).connect(o1.frequency);
+        vib.connect(gainVib).connect(o2.frequency);
+        vib.connect(gainVib).connect(o3.frequency);
 
         //CONNECTION
         o1.connect(g).connect(panner1).connect(c.destination);
