@@ -9,7 +9,7 @@ const textContent = document.getElementById("content");
 const search = document.getElementById("searchUser");
 const weatherButton = document.getElementById("submit");
 const image = document.querySelector(".image img");
-var hour = document.getElementById("hour");
+var hour = 0; //document.getElementById("hour");
 var weather;
 let decimals = 1;
 

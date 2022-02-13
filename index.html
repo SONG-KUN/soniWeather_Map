@@ -2,12 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="./libs/v6.9.0-dist/ol.css">
+    <link rel = "stylesheet" href = "style.css">
+    <link rel = "stylesheet" href = "./libs/v6.9.0-dist/ol.css">
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/build/ol.js"></script>
     <title>soniWeather-Map</title>
 
@@ -15,50 +14,45 @@
 
 <body>
 
-<div class="grid-container">
-    <div class="grid-1">
-        <div class="sidebar">
+<div class = "grid-container">
+    <div class = "grid-1">
+        <div class = "sidebar">
+            <h3>Layer Switcher</h3>
             <br><br>
             <h3 class="lead">Search Bar</h3>
-            <label for="searchUser"></label><input type="text" id="searchUser" class="form-control"
-                                                   placeholder="Enter Your Location">
+            <input type="text" id="searchUser" class="form-control" placeholder="Enter Your Location">
             <button class="btn-submit" id="submit">Submit</button>
+
+            <!-- Image -->
+            <div class="image">
+                <img src="" />
+            </div>
+
             <div id="content"></div>
 
             <br>
-            <!-- Image -->
-            <div class="image">
-                <img src=""/>
-            </div>
-            <h3>Layer Switcher</h3>
-            <label>
-                <input type="radio" name="baseLayerRadioButton" value="OSMStandard" checked>
-            </label>OSM standard<br>
-            <label>
-                <input type="radio" name="baseLayerRadioButton" value="OSMHumanitarian">
-            </label>OSM Humanitarian<br>
-            <label>
-                <input type="radio" name="baseLayerRadioButton" value="StamenTerrain">
-            </label>Stamen Terrain<br>
+
+            <input type = "radio" name = "baseLayerRadioButton" value = "OSMStandard" checked>OSM standard<br>
+            <input type = "radio" name = "baseLayerRadioButton" value = "OSMHumanitarian">OSM Humanitarian<br>
+            <input type = "radio" name = "baseLayerRadioButton" value = "StamenTerrain">Stamen Terrain<br>
         </div>
     </div>
 
-    <div class="grid-2">
-        <div id="map" class="map"></div>
+    <div class = "grid-2">
+        <div id = "map" class = "map"></div>
     </div>
 
-    <div class="overlay-container">
-        <span id="feature-name" class="overlay-text"></span><br>
-        <span id="feature-additional-info" class="overlay-text"></span><br>
+    <div class = "overlay-container">
+        <span id = "feature-name" class = "overlay-text"></span><br>
+        <span id = "feature-additional-info" class = "overlay-text"></span><br>
     </div>
 
 </div>
 
-
-<script src="main.js"></script>
-<script src="WeatherDataCatcher/dataGetter.js"></script>
-<script src="SoundDesigner/soundGenerator.js"></script>
-<!-- <script src = "SoundDesigner/soundGenerator.js"></script> -->
+<script src = "main.js"></script>
+<script src = "WeatherDataCatcher/dataGetter.js"></script>
+<script src = "SoundDesigner/soundGenerator.js"></script>
+<!--script src = "./libs/v6.9.0-dist/ol.js"></script--
 
 </body>
 </html>
