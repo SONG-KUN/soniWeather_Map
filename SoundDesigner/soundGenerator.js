@@ -41,8 +41,7 @@ function sound() {
     temperature = scale(temperature, constraints.prototype.minTemperature, constraints.prototype.maxTemperature, 0, 100);
 
     //all %
-    let humidity =soundWeather.relativeHumidity;
-    humidity = scale(humidity, 0, 100, 0, 30);
+    const humidity =soundWeather.relativeHumidity;
     const cloud = soundWeather.cloudCover;
     const rainProb = soundWeather.rainProbability;
 
