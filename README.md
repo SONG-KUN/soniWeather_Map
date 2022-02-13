@@ -12,8 +12,11 @@
 <img src="https://user-images.githubusercontent.com/55760098/153765913-e76a43ae-9b49-43e8-b35c-25163e0564e1.png" width = "460" height = "280" alt="strcture" align=center />
 
 ***The tools we used:***
+Open Layer API
+AccuWeather API
 
 ***How to use?***
+Download it into an IDE, execute. Executable not available
 
 ## Other Reference
 Introduction: [Guidelines.pdf](https://github.com/SONG-KUN/soniWeather_Map/files/7771131/Guidelines.pdf)
