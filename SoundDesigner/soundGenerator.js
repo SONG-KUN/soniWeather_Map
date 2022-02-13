@@ -187,7 +187,7 @@ function sound() {
      * Rain sound generator
      * @param rain forecast of rain
      */
-    function playRain (rain) {
+    function playRain (rain, rainProb) {
 
         //clear interval and creat new one
         clearInterval(intervalRain);
@@ -200,28 +200,6 @@ function sound() {
         const o2 = c.createOscillator()
         const o3 = c.createOscillator()
         const g = c.createGain();
-
-        const gNoise1 = c.createGain();
-        const gNoise2 = c.createGain();
-
-        //NOISE SECTION
-        const bufferSize = 2 * c.sampleRate,
-            noiseBuffer = c.createBuffer(1, bufferSize, c.sampleRate),
-            output = noiseBuffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            output[i] = Math.random() * 2 - 1;
-        }
-        let whiteNoise = c.createBufferSource();
-        whiteNoise.buffer = noiseBuffer;
-        whiteNoise.loop = true;
-
-        //FILTER SECTION
-        const lpf = c.createBiquadFilter();
-        lpf.frequency.value = 500;
-
-        //WAVE SHAPER
-        const clip = c.createWaveShaper();
-        clip.curve = new Float32Array([-1, 1]);
 
         //const dur = randomNumber(0.1,0.1);
         const dur = randomNumber(50, 200) / 1000;
@@ -247,22 +225,12 @@ function sound() {
         o3.connect(g);
         g.connect(c.destination);
 
-        gNoise2.gain.value = rain;
-        //TO DO link weather parameter (mm of rain to the soundscape)
-        //pink noise multiply white noise
-        whiteNoise.connect(lpf).connect(gNoise1.gain);
-        //result is clipped (waveshaper)
-        whiteNoise.connect(gNoise1).connect(clip).connect(gNoise2).connect(c.destination);
-
-        /*
         o1.start(now);
         o1.stop(now+dur);
         o2.start(now);
         o2.stop(now+dur);
         o3.start(now);
         o3.stop(now+dur);
-         */
-        whiteNoise.start(now);
 
         if (c.currentTime - startTime > totalDuration)
         {
