@@ -223,9 +223,9 @@ const updateUI = () => {
     <h4 class="font-c">${"Wind Speed: " + weather.windSpeed.toFixed(decimals) + " km/h"}</h4>
     <h4 class="font-c">${"Cloud Cover: " + weather.cloudCover.toFixed(decimals)} &percnt;</h4>
     <h4 class="font-c">${"Rain Probability: " + weather.rainProbability.toFixed(decimals)} &percnt;</h4>
-    <h4 class="font-c">${"Rain Probability: " + weather.rainValue.toFixed(decimals) + " mm"}</h4>
+    <h4 class="font-c">${"Rain: " + weather.rainValue.toFixed(decimals) + " mm"}</h4>
     <h4 class="font-c">${"Snow Probability: " + weather.snowProbability.toFixed(decimals)} &percnt;</h4>
-    <h4 class="font-c">${"Snow Probability: " + weather.snowValue.toFixed(decimals)/10 + " cm"} </h4>
+    <h4 class="font-c">${"Snow: " + weather.snowValue.toFixed(decimals)/10 + " cm"} </h4>
   `;
 
     //updating image
