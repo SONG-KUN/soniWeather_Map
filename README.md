@@ -7,12 +7,13 @@
 ## Structure
 ***The project can be divided into three parts:***
 - MAP
-<img src="https://user-images.githubusercontent.com/55760098/153865491-82a9e898-80e7-422a-879d-81a7b2430543.png" width = "460" height = "250" alt="strcture" align=center background=red>
+<img src="https://user-images.githubusercontent.com/55760098/153867991-3e1dd4a0-46f2-4cc1-b2f4-46ba11bd59d8.png" width = "400" height = "240" alt="strcture" align=center>
 <br/>
 
 - WEATHER
-<img src="https://user-images.githubusercontent.com/55760098/153865674-26de51c8-7ad4-4582-89eb-05520d08a11f.png" width = "430" height = "250" alt="strcture" align=center>
+<img src="https://user-images.githubusercontent.com/55760098/153868693-755c4305-993f-425b-b5b2-af41316d03a1.png" width = "400" height = "240" alt="strcture" align=center>
 <br/>
+
 
 - SOOUND DESIGN
 <img src="https://user-images.githubusercontent.com/55760098/153865918-f3d74e7f-576c-419a-bcc6-b98551c5a095.png" width = "660" height = "330" alt="strcture" align=center color = red>
@@ -21,11 +22,11 @@
 
 
 
-## The tools we used
-Open Layer API
+## The Tools We Used
+Open Layer API<br/>
 AccuWeather API
 
-## How to use this project?
+## How To Use This Project?
 Download it into an IDE, execute. Executable not available
 
 ## Other Reference
