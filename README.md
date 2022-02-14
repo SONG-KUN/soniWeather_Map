@@ -15,8 +15,10 @@
 <br/>
 
 
-- SOOUND DESIGN
-<img src="https://user-images.githubusercontent.com/55760098/153865918-f3d74e7f-576c-419a-bcc6-b98551c5a095.png" width = "660" height = "330" alt="strcture" align=center color = red>
+- SOUND DESIGN<br/>
+***e.g. The following is the structure of the synthesized cloud cover sound. We have to consider many parameter of weather like the humidity, temperature, etc.***
+<br/>
+<img src="https://user-images.githubusercontent.com/55760098/153865918-f3d74e7f-576c-419a-bcc6-b98551c5a095.png" width = "680" height = "330" alt="strcture" align=center color = red>
 <br/><br/>
 
 
