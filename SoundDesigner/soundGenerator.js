@@ -25,7 +25,7 @@ function sound() {
     }
 
     //RETRIEVE off WEATHER PARAMETERS - ALL VALUE SCALED in [0;100]
-    const soundWeather = getCityHourForecast(hour);
+    const soundWeather = getCityHourForecast();
 
     let wind = soundWeather.windSpeed;
     wind = scale(wind, 0, maxWind, 0, 100);
@@ -46,7 +46,7 @@ function sound() {
     const rainProb = soundWeather.rainProbability;
 
     // duration of the entire event (maybe 1 min?)
-    let totalDuration = 30;      //secs
+    let totalDuration = 25;      //secs
     const c = new AudioContext();
     const startTime = c.currentTime;
 
