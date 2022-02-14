@@ -29,7 +29,7 @@ Open Layer API<br/>
 AccuWeather API
 
 ## How To Use This Project?
-Download it into an IDE, execute. Executable not available
+Download it into an IDE, then execute it. In order to get the weather forecast info and the corresponding sound of the city you want to know, you can directly input the city name on the search bar, or you can also find the city you interested on the map then click on it.
 
 ## Other Reference
 Introduction: [Guidelines.pdf](https://github.com/SONG-KUN/soniWeather_Map/files/7771131/Guidelines.pdf)
