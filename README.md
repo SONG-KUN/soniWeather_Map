@@ -2,26 +2,25 @@
 > *'Listen to the Weather'*
 
 ## Object
-***Our goal is to give the users a map that can generate sounds that are related to the location of the city and the corresponding weather of the city. At the same time, users can also get the weather forecas information of the corresponding city, like "Temperature", "Humidity", "Wind Speed", "Cloud Cover", "Rain Probability", etc.***
+***Instead of just looking at the weather, listen to it! The user can search for a location or click it on the map to find out what the weather will be like!***
+
+***The music is generated in real time and is based on a selection of weather parameters: "Temperature", "humidity", "cloud cover", "rain", "snow", "wind" etc. The sound must be linked to the different weather conditions, in order to create a sensation that evokes the atmospherical events. The user should listen to the sound and immediately understand what’s the weather like.***
+
+<img width="720" alt="image" src="https://user-images.githubusercontent.com/26285839/153925464-f05543c9-4b6a-4627-b5ad-6e34c84e4075.png">
+
 
 ## Structure
-***The project can be divided into three parts:***
-- MAP
-<img src="https://user-images.githubusercontent.com/55760098/153867991-3e1dd4a0-46f2-4cc1-b2f4-46ba11bd59d8.png" width = "400" height = "240" alt="strcture" align=center>
-<br/>
+***The main scheme of the project:***
 
-- WEATHER
-<img src="https://user-images.githubusercontent.com/55760098/153868693-755c4305-993f-425b-b5b2-af41316d03a1.png" width = "400" height = "240" alt="strcture" align=center>
-<br/>
+![SoniWeather_Map-Interaction Graph drawio (1)](https://user-images.githubusercontent.com/26285839/153927909-3628c21d-31cf-49b4-bb26-c6c7d991fbe6.png)
 
 
-- SOUND DESIGN<br/>
-***e.g. The following is the structure of the synthesized cloud cover sound. We have to consider many parameters of weather like the humidity, temperature, etc.***
-<br/>
-<img src="https://user-images.githubusercontent.com/55760098/153865918-f3d74e7f-576c-419a-bcc6-b98551c5a095.png" width = "680" height = "330" alt="strcture" align=center color = red>
-<br/><br/>
+## SOUND DESIGN
+***The following is the structure of the synthesized sounds***
 
 
+<img width="724" alt="image" src="https://user-images.githubusercontent.com/26285839/153926825-99e4aaae-017c-41a0-8e97-aa73209e7155.png">
+<img width="722" alt="image" src="https://user-images.githubusercontent.com/26285839/153927698-fe2c14fa-c750-4dbc-8e45-99416fce48b3.png">
 
 
 ## The Tools We Used
