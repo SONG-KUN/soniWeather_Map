@@ -1,7 +1,7 @@
 /**
  * @Author Davide Lorenzi
  * This class is used to get weather forecast from AccuWeather using the website free (but limited) APIs
- * Tose information will be turned to the music generator
+ * Information will be turned to the music generator
  */
 
 var debug = 0; //debug variable used to

@@ -1,5 +1,6 @@
 /**
  * Sound generator
+ * @author Nicolò Pisanu
  */
 
 var intervalWind = -1;

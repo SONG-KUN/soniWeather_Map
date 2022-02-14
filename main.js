@@ -1,4 +1,11 @@
-//variables used in retrive informations
+/**
+ *
+ * @author Davide Lorenzi
+ * @author Nicolò Pisanu
+ * @author Haukun Song
+ */
+
+//array of api keys, shuffled
 const APIKeys = ['G2RHDSZWOO0lHDHSSf339l9MeaEip0VW' , 'a39nt3GG9ZNiFsNmXADD0n4KWPSrlIhf'/*, 'rVlJUvfhFOVCS0J49iwPUGgUcGMAIX0z'*/];
 
 // URL of the TILE SERVER
